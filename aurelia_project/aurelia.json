@@ -86,7 +86,12 @@
             "name": "aurelia-testing",
             "env": "dev"
           },
-          "text"
+          "text",
+          {
+            "name": "the-new-css-reset",
+            "path": "../node_modules/the-new-css-reset/",
+            "main": "css/reset.css"
+          }
         ]
       }
     ],
