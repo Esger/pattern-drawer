@@ -1,5 +1,10 @@
 <template>
     <require from="./the-canvas.css"></require>
+    <div class="tools">
+        <button type="button"
+                class="tools__button"
+                click.delegate="draw()">✏️</button>
+    </div>
     <canvas id="patternCanvas"
             class="patternCanvas"
             mousemove.delegate="onMouseMove($event)"

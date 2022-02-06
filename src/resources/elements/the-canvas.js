@@ -4,7 +4,7 @@ import { paper } from 'paper';
 export class TheCanvas {
     @bindable value;
     constructor() {
-        // this._element = element;
+        this._isDrawing = false;
     }
 
     attached() {
@@ -15,22 +15,38 @@ export class TheCanvas {
         console.log(paper);
     }
 
-    _demo() {
-        // Create a Paper.js Path to draw a line into it:
-        const path = new paper.Path();
-        // Give the stroke a color
-        path.strokeColor = 'black';
-        const start = new paper.Point(100, 100);
-        // Move to start and draw a line from there
-        path.moveTo(start);
-        // Note that the plus operator on Point objects does not work
-        // in JavaScript. Instead, we need to call the add() function:
-        path.lineTo(start.add([200, -50]));
-        // Draw the view now:
-        paper.view.draw();
+    draw() {
+        paper.project.activeLayer.removeChildren();
+
+        this.onMouseMove = (event) => {
+            if (this._isDrawing) {
+                this._path.add(new paper.Point(event.offsetX, event.offsetY));
+                this._path.smooth({ type: 'continuous' });
+            }
+        }
+
+        this.onMouseDown = (event) => {
+            if (!this._isDrawing) {
+                this._path = new paper.Path({
+                    strokeColor: 'crimson',
+                    strokeWidth: 20,
+                    strokeCap: 'round'
+                });
+                this._path.fullySelected = true;
+                this._path.firstSegment.point = [event.offsetX, event.offsetY];
+            }
+        }
+
+        this.onMouseUp = (event) => {
+            this._path.fullySelected = false;
+            this._isDrawing = !this._isDrawing;
+            console.log(paper);
+        }
     }
 
     _chain() {
+        paper.project.activeLayer.removeChildren();
+
         // Adapted from the following Processing example:
         // http://processing.org/learning/topics/follow3.html
 
@@ -46,7 +62,7 @@ export class TheCanvas {
             strokeCap: 'round'
         });
 
-        var start = paper.view.center;//.divide([10, 1]);
+        var start = paper.view.center.divide([10, 1]);
         for (var i = 0; i < points; i++)
             this._path.add(start + new paper.Point(i * this.segmentLength, 0));
 
@@ -73,6 +89,20 @@ export class TheCanvas {
         }
     }
 
+    _demo() {
+        // Create a Paper.js Path to draw a line into it:
+        const path = new paper.Path();
+        // Give the stroke a color
+        path.strokeColor = 'black';
+        const start = new paper.Point(100, 100);
+        // Move to start and draw a line from there
+        path.moveTo(start);
+        // Note that the plus operator on Point objects does not work
+        // in JavaScript. Instead, we need to call the add() function:
+        path.lineTo(start.add([200, -50]));
+        // Draw the view now:
+        paper.view.draw();
+    }
 
     valueChanged(newValue, oldValue) {
         //
