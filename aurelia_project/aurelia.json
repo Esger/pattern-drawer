@@ -94,6 +94,7 @@
                     },
                     {
                         "name": "paper",
+                        "type": "text/paperscript",
                         "path": "../node_modules/paper/",
                         "main": "dist/paper-full.js"
                     }
