@@ -2,5 +2,8 @@
     <require from="./the-canvas.css"></require>
     <canvas id="patternCanvas"
             class="patternCanvas"
+            mousemove.delegate="onMouseMove($event)"
+            mousedown.delegate="onMouseDown($event)"
+            mouseup.delegate="onMouseUp($event)"
             resize></canvas>
 </template>
