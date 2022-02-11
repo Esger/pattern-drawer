@@ -1,17 +1,26 @@
 import { bindable, inject } from 'aurelia-framework';
+import { EventAggregator } from 'aurelia-event-aggregator';
 import { paper } from 'paper';
-@inject(paper)
+
+@inject(EventAggregator, paper)
 export class TheCanvas {
     @bindable value;
     constructor() {
-        this._isDrawing = false;
+
+    constructor(eventAggregator) {
+        this._eventAggregator = eventAggregator;
     }
 
     attached() {
+        this.drawSubscription = this._eventAggregator.subscribe('draw', _ => this.draw());
+        this.wormSubscription = this._eventAggregator.subscribe('worm', _ => this.worm());
+    detached() {
+        this.drawSubscription.dispose();
+        this.wormSubscription.dispose();
+    }
         const canvas = document.getElementById('patternCanvas');
         paper.setup(canvas);
         this._chain();
-        // this._demo();
         console.log(paper);
     }
 
@@ -104,7 +113,4 @@ export class TheCanvas {
         paper.view.draw();
     }
 
-    valueChanged(newValue, oldValue) {
-        //
-    }
 }

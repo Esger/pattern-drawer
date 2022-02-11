@@ -1,0 +1,12 @@
+<template>
+    <require from="./tools.css"></require>
+    <div class="tools">
+        <button if.bind="isDrawing" type="button"
+                    class="tools__button"
+                    click.delegate="worm()">🪱</button>
+        <button if.bind="!isDrawing"
+                    type="button"
+                    class="tools__button"
+                    click.delegate="draw()">✏️</button>
+    </div>
+</template>
