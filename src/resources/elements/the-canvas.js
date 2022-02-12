@@ -36,28 +36,33 @@ export class TheCanvas {
     draw() {
         this._drawTool = this._drawTool || new paper.Tool();
         this._drawTool.activate();
-        let path;
         const newPath = _ => new paper.Path({
             strokeColor: 'crimson',
             strokeWidth: 20,
             strokeCap: 'round'
         });
+        let path; // = newPath();
+        let penDown = false;
 
         this._drawTool.onMouseDown = (event) => {
-            path = newPath();
-            path.fullySelected = true;
-            path.add(new paper.Point(event.point));
+            penDown = !penDown;
+            if (penDown) {
+                path = newPath();
+                path.add(new paper.Point(event.point));
+            }
         }
 
         this._drawTool.onMouseMove = (event) => {
-            path.add(new paper.Point(event.point));
-            path.smooth({ type: 'continuous' });
+            if (penDown) {
+                // path.fullySelected = true;
+                path.add(new paper.Point(event.point));
+            }
         }
 
         this._drawTool.onMouseUp = (event) => {
-            path.fullySelected = false;
-            this.isDrawing = !this.isDrawing;
-            console.log(paper);
+            path.simplify();
+            // path.fullySelected = false;
+            // console.log(paper);
         }
     }
 
@@ -70,40 +75,39 @@ export class TheCanvas {
 
         // The distance between the points:
         const segmentLength = 35;
-
-        const path = new paper.Path({
-            strokeColor: 'crimson',
-            strokeWidth: 20,
-            strokeCap: 'round'
-        });
+        if (!this._wormPath) {
+            this._wormPath = new paper.Path({
+                strokeColor: 'crimson',
+                strokeWidth: 20,
+                strokeCap: 'round'
+            });
+            var start = paper.view.center.divide([10, 1]);
+            for (var i = 0; i < points; i++)
+                this._wormPath.add(start + new paper.Point(i * segmentLength, 0));
+        }
 
         this._wormTool = this._wormTool || new paper.Tool();
         this._wormTool.activate();
-
-        var start = paper.view.center.divide([10, 1]);
-        for (var i = 0; i < points; i++)
-            path.add(start + new paper.Point(i * segmentLength, 0));
-
         this._wormTool.onMouseMove = (event) => {
-            path.firstSegment.point = event.point;
-            for (let i = 0; i < path.segments.length - 1; i++) {
-                const segment = path.segments[i];
+            this._wormPath.firstSegment.point = event.point;
+            for (let i = 0; i < this._wormPath.segments.length - 1; i++) {
+                const segment = this._wormPath.segments[i];
                 const nextSegment = segment.next;
                 const vector = segment.point.subtract(nextSegment.point);
                 vector.length = segmentLength;
                 nextSegment.point = segment.point.subtract(vector);
             }
-            path.smooth({ type: 'continuous' });
+            this._wormPath.smooth({ type: 'continuous' });
         }
 
         this._wormTool.onMouseDown = (event) => {
-            path.fullySelected = true;
-            path.strokeColor = '#e08285';
+            this._wormPath.fullySelected = true;
+            this._wormPath.strokeColor = '#e08285';
         }
 
         this._wormTool.onMouseUp = (event) => {
-            path.fullySelected = false;
-            path.strokeColor = '#e4141b';
+            this._wormPath.fullySelected = false;
+            this._wormPath.strokeColor = '#e4141b';
         }
     }
 
