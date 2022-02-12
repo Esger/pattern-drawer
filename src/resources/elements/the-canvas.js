@@ -1,12 +1,16 @@
-import { bindable, inject } from 'aurelia-framework';
+import { inject } from 'aurelia-framework';
 import { EventAggregator } from 'aurelia-event-aggregator';
 import { paper } from 'paper';
 
 @inject(EventAggregator, paper)
 export class TheCanvas {
-    @bindable value;
     _drawTool;
     _wormTool;
+    _paths = [];
+    _offsets = [];
+    _toroid = {
+        horizontal: false, vertical: false
+    }
 
     constructor(eventAggregator) {
         this._eventAggregator = eventAggregator;
@@ -76,18 +80,22 @@ export class TheCanvas {
         // The distance between the points:
         const segmentLength = 35;
 
+        let path;
+
         const addWormPath = () => {
             // The amount of points in the path:
             const points = 25;
-            if (!this._wormPath) {
-                this._wormPath = new paper.Path({
+            if (!path) {
+                path = new paper.Path({
                     strokeColor: 'crimson',
                     strokeWidth: 20,
                     strokeCap: 'round'
                 });
                 var start = paper.view.center.divide([10, 1]);
                 for (var i = 0; i < points; i++)
-                    this._wormPath.add(start + new paper.Point(i * segmentLength, 0));
+                    path.add(start + new paper.Point(i * segmentLength, 0));
+                this._paths.push(path);
+                this._offsets.push(new paper.Point(0, 0));
             }
         }
 
@@ -96,43 +104,62 @@ export class TheCanvas {
         this._wormTool = this._wormTool || new paper.Tool();
         this._wormTool.activate();
         this._wormTool.onMouseMove = (event) => {
-            if (this._wormPath) {
-                this._wormPath.firstSegment.point = event.point;
-                for (let i = 0; i < this._wormPath.segments.length - 1; i++) {
-                    const segment = this._wormPath.segments[i];
+            this._paths.forEach((path, index) => {
+                path.firstSegment.point = event.point.add(this._offsets[index]);
+                for (let i = 0; i < path.segments.length - 1; i++) {
+                    const segment = path.segments[i];
                     const nextSegment = segment.next;
                     const vector = segment.point.subtract(nextSegment.point);
                     vector.length = segmentLength;
                     nextSegment.point = segment.point.subtract(vector);
                 }
-                this._wormPath.smooth({ type: 'continuous' });
-            }
+                path.smooth({ type: 'continuous' });
+            })
         }
 
-        this._wormTool.onMouseDown = (event) => {
-            if (this._wormPath) {
-                this._wormPath.fullySelected = true;
-                this._wormPath.strokeColor = '#e08285';
+        this._wormTool.onMouseDown = _ => {
+            if (this._paths.length) {
+                this._paths.forEach(path => {
+                    path.fullySelected = true;
+                    path.strokeColor = '#e08285';
+                })
             } else {
                 addWormPath();
             }
         }
 
-        this._wormTool.onMouseUp = (event) => {
-            if (this._wormPath) {
-                this._wormPath.fullySelected = false;
-                this._wormPath.strokeColor = '#e4141b';
+        this._wormTool.onMouseUp = _ => {
+            if (this._paths.length) {
+                this._paths.forEach(path => {
+                    path.fullySelected = false;
+                    path.strokeColor = '#e4141b';
+                })
             }
         }
     }
 
     erase() {
         paper.project.activeLayer.removeChildren();
-        this._wormPath = undefined;
+        this._paths = [];
     }
 
     duplicate(direction) {
-        console.log(paper);
+        const clonePath = this._paths[0].clone();
+        if (direction == 'horizontal') {
+            const offset = new paper.Point(Math.round(paper.view.viewSize.width / 2), 0);
+            clonePath.position = offset;
+            this._offsets.push(offset);
+            if (!this._toroid.horizontal) {
+                const clonePath = this._paths[0].clone();
+                const offset = new paper.Point(- Math.round(paper.view.viewSize.width / 2), 0);
+                clonePath.position = offset;
+                this._offsets.push(offset);
+                this._paths.push(clonePath);
+                this._toroid.horizontal = true;
+            }
+        }
+        this._paths.push(clonePath);
+        console.log(paper, paper.view.viewSize.width);
     }
 
 }
