@@ -39,4 +39,8 @@ export class ToolsCustomElement {
         this._eventAggregator.publish('erase');
     }
 
+    duplicate(direction) {
+        this._eventAggregator.publish('duplicate', { direction: direction });
+    }
+
 }

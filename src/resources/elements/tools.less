@@ -19,6 +19,18 @@
     font-size: 1.5rem;
     cursor   : pointer;
 
+    div {
+        position: relative;
+    }
+
+    &.tools__button--duplicateHorizontal div {
+        transform: rotate(180deg);
+    }
+
+    &.tools__button--duplicateVertical div {
+        transform: rotate(90deg);
+    }
+
     &.tools__button--active {
         opacity: 0.5;
         cursor : auto;

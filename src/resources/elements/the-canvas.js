@@ -16,16 +16,17 @@ export class TheCanvas {
     attached() {
         this._initCanvas();
         this.worm();
-        // this.draw();
-        this.drawSubscription = this._eventAggregator.subscribe('draw', _ => this.draw());
-        this.wormSubscription = this._eventAggregator.subscribe('worm', _ => this.worm());
-        this.eraseSubscription = this._eventAggregator.subscribe('erase', _ => this.erase());
+        this._drawSubscription = this._eventAggregator.subscribe('draw', _ => this.draw());
+        this._wormSubscription = this._eventAggregator.subscribe('worm', _ => this.worm());
+        this._eraseSubscription = this._eventAggregator.subscribe('erase', _ => this.erase());
+        this._duplicateSubscription = this._eventAggregator.subscribe('duplicate', data => this.duplicate(data.direction));
     }
 
     detached() {
-        this.drawSubscription.dispose();
-        this.wormSubscription.dispose();
-        this.eraseSubscription.dispose();
+        this._drawSubscription.dispose();
+        this._wormSubscription.dispose();
+        this._eraseSubscription.dispose();
+        this._duplicateSubscription.dispose();
     }
 
     _initCanvas() {
@@ -128,6 +129,10 @@ export class TheCanvas {
     erase() {
         paper.project.activeLayer.removeChildren();
         this._wormPath = undefined;
+    }
+
+    duplicate(direction) {
+        console.log(paper);
     }
 
 }
