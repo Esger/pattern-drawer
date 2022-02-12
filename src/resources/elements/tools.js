@@ -1,8 +1,7 @@
-import { inject, bindable } from 'aurelia-framework';
+import { inject } from 'aurelia-framework';
 import { EventAggregator } from 'aurelia-event-aggregator';
 @inject(EventAggregator)
 export class ToolsCustomElement {
-    @bindable value;
     constructor(eventAggregator) {
         this._eventAggregator = eventAggregator;
         this.isDrawing = false;
@@ -18,7 +17,8 @@ export class ToolsCustomElement {
         this._eventAggregator.publish('worm');
     }
 
-    valueChanged(newValue, oldValue) {
-        //
+    erase() {
+        this._eventAggregator.publish('erase');
     }
+
 }

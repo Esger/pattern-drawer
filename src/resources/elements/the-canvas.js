@@ -19,12 +19,13 @@ export class TheCanvas {
         // this.draw();
         this.drawSubscription = this._eventAggregator.subscribe('draw', _ => this.draw());
         this.wormSubscription = this._eventAggregator.subscribe('worm', _ => this.worm());
+        this.eraseSubscription = this._eventAggregator.subscribe('erase', _ => this.erase());
     }
 
     detached() {
-        this._killCanvas();
         this.drawSubscription.dispose();
         this.wormSubscription.dispose();
+        this.eraseSubscription.dispose();
     }
 
     _initCanvas() {
@@ -41,7 +42,7 @@ export class TheCanvas {
             strokeWidth: 20,
             strokeCap: 'round'
         });
-        let path; // = newPath();
+        let path;
         let penDown = false;
 
         this._drawTool.onMouseDown = (event) => {
@@ -89,26 +90,37 @@ export class TheCanvas {
         this._wormTool = this._wormTool || new paper.Tool();
         this._wormTool.activate();
         this._wormTool.onMouseMove = (event) => {
-            this._wormPath.firstSegment.point = event.point;
-            for (let i = 0; i < this._wormPath.segments.length - 1; i++) {
-                const segment = this._wormPath.segments[i];
-                const nextSegment = segment.next;
-                const vector = segment.point.subtract(nextSegment.point);
-                vector.length = segmentLength;
-                nextSegment.point = segment.point.subtract(vector);
+            if (this._wormPath) {
+                this._wormPath.firstSegment.point = event.point;
+                for (let i = 0; i < this._wormPath.segments.length - 1; i++) {
+                    const segment = this._wormPath.segments[i];
+                    const nextSegment = segment.next;
+                    const vector = segment.point.subtract(nextSegment.point);
+                    vector.length = segmentLength;
+                    nextSegment.point = segment.point.subtract(vector);
+                }
+                this._wormPath.smooth({ type: 'continuous' });
             }
-            this._wormPath.smooth({ type: 'continuous' });
         }
 
         this._wormTool.onMouseDown = (event) => {
-            this._wormPath.fullySelected = true;
-            this._wormPath.strokeColor = '#e08285';
+            if (this._wormPath) {
+                this._wormPath.fullySelected = true;
+                this._wormPath.strokeColor = '#e08285';
+            }
         }
 
         this._wormTool.onMouseUp = (event) => {
-            this._wormPath.fullySelected = false;
-            this._wormPath.strokeColor = '#e4141b';
+            if (this._wormPath) {
+                this._wormPath.fullySelected = false;
+                this._wormPath.strokeColor = '#e4141b';
+            }
         }
+    }
+
+    erase() {
+        paper.project.activeLayer.removeChildren();
+        this._wormPath = undefined;
     }
 
 }
