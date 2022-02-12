@@ -71,21 +71,26 @@ export class TheCanvas {
         // Adapted from the following Processing example:
         // http://processing.org/learning/topics/follow3.html
 
-        // The amount of points in the path:
-        const points = 25;
 
         // The distance between the points:
         const segmentLength = 35;
-        if (!this._wormPath) {
-            this._wormPath = new paper.Path({
-                strokeColor: 'crimson',
-                strokeWidth: 20,
-                strokeCap: 'round'
-            });
-            var start = paper.view.center.divide([10, 1]);
-            for (var i = 0; i < points; i++)
-                this._wormPath.add(start + new paper.Point(i * segmentLength, 0));
+
+        const addWormPath = () => {
+            // The amount of points in the path:
+            const points = 25;
+            if (!this._wormPath) {
+                this._wormPath = new paper.Path({
+                    strokeColor: 'crimson',
+                    strokeWidth: 20,
+                    strokeCap: 'round'
+                });
+                var start = paper.view.center.divide([10, 1]);
+                for (var i = 0; i < points; i++)
+                    this._wormPath.add(start + new paper.Point(i * segmentLength, 0));
+            }
         }
+
+        addWormPath();
 
         this._wormTool = this._wormTool || new paper.Tool();
         this._wormTool.activate();
@@ -107,6 +112,8 @@ export class TheCanvas {
             if (this._wormPath) {
                 this._wormPath.fullySelected = true;
                 this._wormPath.strokeColor = '#e08285';
+            } else {
+                addWormPath();
             }
         }
 
