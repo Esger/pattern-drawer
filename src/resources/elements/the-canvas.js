@@ -7,10 +7,9 @@ export class TheCanvas {
     _drawTool;
     _wormTool;
     _paths = [];
-    _offsets = [];
-    _toroid = {
-        horizontal: false, vertical: false
-    }
+    _xOffsets = [];
+    _yOffsets = [];
+    _mode = '';
 
     constructor(eventAggregator) {
         this._eventAggregator = eventAggregator;
@@ -19,11 +18,20 @@ export class TheCanvas {
 
     attached() {
         this._initCanvas();
-        this.worm();
-        this._drawSubscription = this._eventAggregator.subscribe('draw', _ => this.draw());
-        this._wormSubscription = this._eventAggregator.subscribe('worm', _ => this.worm());
-        this._eraseSubscription = this._eventAggregator.subscribe('erase', _ => this.erase());
-        this._duplicateSubscription = this._eventAggregator.subscribe('duplicate', data => this.duplicate(data.direction));
+        this._worm();
+        this._drawSubscription = this._eventAggregator.subscribe('draw', _ => this._draw());
+        this._wormSubscription = this._eventAggregator.subscribe('worm', _ => this._worm());
+        this._eraseSubscription = this._eventAggregator.subscribe('erase', _ => this._erase());
+        this._duplicateSubscription = this._eventAggregator.subscribe('duplicate', data => {
+            switch (this._mode) {
+                case 'worm':
+                    this._duplicateWorm(data.direction);
+                    break;
+                case 'draw':
+                    this._duplicateDraw(data.direction)
+                    break;
+            }
+        });
     }
 
     detached() {
@@ -39,7 +47,9 @@ export class TheCanvas {
         console.log(paper);
     }
 
-    draw() {
+    _draw() {
+        this._erase();
+        this._mode = 'draw';
         this._drawTool = this._drawTool || new paper.Tool();
         this._drawTool.activate();
         const newPath = _ => new paper.Path({
@@ -72,7 +82,9 @@ export class TheCanvas {
         }
     }
 
-    worm() {
+    _worm() {
+        this._erase();
+        this._mode = 'worm';
         // Adapted from the following Processing example:
         // http://processing.org/learning/topics/follow3.html
 
@@ -94,8 +106,11 @@ export class TheCanvas {
                 var start = paper.view.center.divide([10, 1]);
                 for (var i = 0; i < points; i++)
                     path.add(start + new paper.Point(i * segmentLength, 0));
+                path.name = 'original';
                 this._paths.push(path);
-                this._offsets.push(new paper.Point(0, 0));
+                const offset = new paper.Point(0, 0);
+                this._xOffsets.push(offset);
+                this._yOffsets.push(offset);
             }
         }
 
@@ -105,7 +120,7 @@ export class TheCanvas {
         this._wormTool.activate();
         this._wormTool.onMouseMove = (event) => {
             this._paths.forEach((path, index) => {
-                path.firstSegment.point = event.point.add(this._offsets[index]);
+                path.firstSegment.point = event.point.add(this._xOffsets[index]);
                 for (let i = 0; i < path.segments.length - 1; i++) {
                     const segment = path.segments[i];
                     const nextSegment = segment.next;
@@ -138,27 +153,45 @@ export class TheCanvas {
         }
     }
 
-    erase() {
+    _erase() {
         paper.project.activeLayer.removeChildren();
         this._paths = [];
+        this._xOffsets = [];
     }
 
-    duplicate(direction) {
-        const clonePath = this._paths[0].clone();
-        if (direction == 'horizontal') {
-            const offset = new paper.Point(Math.round(paper.view.viewSize.width / 2), 0);
-            clonePath.position = offset;
-            this._offsets.push(offset);
-            if (!this._toroid.horizontal) {
-                const clonePath = this._paths[0].clone();
-                const offset = new paper.Point(- Math.round(paper.view.viewSize.width / 2), 0);
-                clonePath.position = offset;
-                this._offsets.push(offset);
-                this._paths.push(clonePath);
-                this._toroid.horizontal = true;
+    _addXoffset() {
+        this._xOffsets.push(new Point(0, 0));
+        const count = this._xOffsets.length;
+        const gap = Math.round(paper.view.size.width / count);
+        const firstX = gap / 2;
+        const offsets = this._xOffsets.map((point, index) => {
+            const x = (index - (count / 2)) * gap + firstX;
+            point.x = x;
+            return point;
+        });
+        this._xOffsets = offsets;
+    }
+
+    _duplicateWorm(direction) {
+        if (this._paths.length) {
+            if (direction == 'horizontal') {
+                this._addXoffset();
+                this._yOffsets.forEach((offset, index) => {
+                    const clonePath = this._paths[0].clone();
+                    // clonePath.name = 'xCopy';
+                    // const tempOffset = new Point(offset.x, this._paths[0].position.y);
+                    clonePath.position = offset;
+                    this._paths.push(clonePath);
+                });
             }
+            if (direction == 'vertical') {
+
+            }
+            const group = new paper.Group({
+                children: this._paths,
+                position: paper.view.center
+            });
         }
-        this._paths.push(clonePath);
         console.log(paper, paper.view.viewSize.width);
     }
 
