@@ -7,6 +7,24 @@ export class ToolsCustomElement {
         this.isDrawing = false;
     }
 
+    attached() {
+        this.showTools();
+        this.hideTools(5000);
+        $('.tools__button').on('mouseenter', _ => this.showTools());
+        $('.tools__button').on('mouseleave', _ => this.hideTools(500));
+    }
+
+    hideTools(timeout) {
+        this.hideTimeoutHandle = setTimeout(() => {
+            this.toolsVisible = false;
+        }, timeout);
+    }
+
+    showTools() {
+        clearTimeout(this.hideTimeoutHandle);
+        this.toolsVisible = true;
+    }
+
     draw() {
         this.isDrawing = true;
         this._eventAggregator.publish('draw');

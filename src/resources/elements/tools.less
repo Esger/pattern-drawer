@@ -5,6 +5,12 @@
     display       : flex;
     flex-direction: column;
     z-index       : 1;
+    opacity       : 1;
+    transition    : opacity 250ms ease;
+
+    &.hidden {
+        opacity: 0;
+    }
 }
 
 .tools__button {

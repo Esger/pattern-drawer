@@ -86,6 +86,7 @@
                         "name": "aurelia-testing",
                         "env": "dev"
                     },
+                    "jquery",
                     "text",
                     {
                         "name": "the-new-css-reset",

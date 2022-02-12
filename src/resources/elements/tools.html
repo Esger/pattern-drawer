@@ -1,6 +1,6 @@
 <template>
     <require from="./tools.css"></require>
-    <div class="tools">
+    <div class="tools ${toolsVisible ? '' : 'hidden'}">
         <button type="button"
                 class="tools__button ${!isDrawing ? 'tools__button--active' : ''}"
                 click.delegate="isDrawing && worm()">🪱</button>
