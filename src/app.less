@@ -1,0 +1,22 @@
+html,
+body {
+    height          : 100%;
+    --black         : #333;
+    --white         : antiquewhite;
+    background-color: var(--black);
+}
+
+h1 {
+    position   : absolute;
+    padding    : 2em;
+    font-family: Bungee Outline;
+    color      : var(--white);
+    font-size  : 2em;
+    padding    : 0.5em;
+    opacity    : 1;
+    transition : opacity 2s ease;
+
+    &.hidden {
+        opacity: 0;
+    }
+}

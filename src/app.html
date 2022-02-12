@@ -1,3 +1,10 @@
 <template>
-  <h1>${message}</h1>
+    <require from="the-new-css-reset/reset.css"></require>
+    <require from="./app.css"></require>
+    <require from="elements/the-canvas"></require>
+    <require from="elements/tools"></require>
+    <h1 class="${titleIsVisible ? '' : 'hidden'}"
+        mouseover.delegate="showTitle()">${message}</h1>
+    <the-canvas containerless></the-canvas>
+    <tools containerless></tools>
 </template>

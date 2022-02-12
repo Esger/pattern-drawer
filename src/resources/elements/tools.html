@@ -1,0 +1,15 @@
+<template>
+    <require from="./tools.css"></require>
+    <div class="tools ${toolsVisible ? '' : 'hidden'}">
+        <button type="button"
+                class="tools__button ${!isDrawing ? 'tools__button--active' : ''}"
+                click.delegate="isDrawing && worm()">🪱</button>
+        <button type="button"
+                class="tools__button ${isDrawing ? 'tools__button--active' : ''}"
+                click.delegate="!isDrawing && draw()">✏️</button>
+        <button type="button"
+                class="tools__button"
+                click.delegate="erase()">💊</button>
+
+    </div>
+</template>
