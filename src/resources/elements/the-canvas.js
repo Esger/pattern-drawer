@@ -7,8 +7,7 @@ export class TheCanvas {
     _drawTool;
     _wormTool;
     _paths = [];
-    _xOffsets = [];
-    _yOffsets = [];
+    _offsets = [];
     _mode = '';
 
     constructor(eventAggregator) {
@@ -19,13 +18,14 @@ export class TheCanvas {
     attached() {
         this._initCanvas();
         this._worm();
+        // this._duplicateWorms('horizontal');
         this._drawSubscription = this._eventAggregator.subscribe('draw', _ => this._draw());
         this._wormSubscription = this._eventAggregator.subscribe('worm', _ => this._worm());
         this._eraseSubscription = this._eventAggregator.subscribe('erase', _ => this._erase());
         this._duplicateSubscription = this._eventAggregator.subscribe('duplicate', data => {
             switch (this._mode) {
                 case 'worm':
-                    this._duplicateWorm(data.direction);
+                    this._duplicateWorms(data.direction);
                     break;
                 case 'draw':
                     this._duplicateDraw(data.direction)
@@ -44,7 +44,7 @@ export class TheCanvas {
     _initCanvas() {
         const canvas = document.getElementById('patternCanvas');
         paper.setup(canvas);
-        console.log(paper);
+        // console.log(paper);
     }
 
     _draw() {
@@ -85,10 +85,6 @@ export class TheCanvas {
     _worm() {
         this._erase();
         this._mode = 'worm';
-        // Adapted from the following Processing example:
-        // http://processing.org/learning/topics/follow3.html
-
-
         // The distance between the points:
         const segmentLength = 35;
 
@@ -108,9 +104,7 @@ export class TheCanvas {
                     path.add(start + new paper.Point(i * segmentLength, 0));
                 path.name = 'original';
                 this._paths.push(path);
-                const offset = new paper.Point(0, 0);
-                this._xOffsets.push(offset);
-                this._yOffsets.push(offset);
+                this._offsets.push([new paper.Point(0, 0)]);
             }
         }
 
@@ -118,9 +112,12 @@ export class TheCanvas {
 
         this._wormTool = this._wormTool || new paper.Tool();
         this._wormTool.activate();
+
         this._wormTool.onMouseMove = (event) => {
-            this._paths.forEach((path, index) => {
-                path.firstSegment.point = event.point.add(this._xOffsets[index]);
+            const offsetsFlat = this._offsets.flat(1);
+            offsetsFlat.forEach((offset, index) => {
+                const path = this._paths[index];
+                path.firstSegment.point = event.point.add(offset);
                 for (let i = 0; i < path.segments.length - 1; i++) {
                     const segment = path.segments[i];
                     const nextSegment = segment.next;
@@ -129,7 +126,7 @@ export class TheCanvas {
                     nextSegment.point = segment.point.subtract(vector);
                 }
                 path.smooth({ type: 'continuous' });
-            })
+            });
         }
 
         this._wormTool.onMouseDown = _ => {
@@ -157,42 +154,57 @@ export class TheCanvas {
         paper.project.activeLayer.removeChildren();
         this._paths = [];
         this._xOffsets = [];
+        this._yOffsets = [];
     }
 
-    _addXoffset() {
-        this._xOffsets.push(new Point(0, 0));
-        const count = this._xOffsets.length;
-        const gap = Math.round(paper.view.size.width / count);
-        const firstX = gap / 2;
-        const offsets = this._xOffsets.map((point, index) => {
-            const x = (index - (count / 2)) * gap + firstX;
-            point.x = x;
-            return point;
-        });
-        this._xOffsets = offsets;
+    _addOffset(direction) {
+        const offsets = [
+            [0],
+            [0],
+            [-1 / 4, 1 / 4],
+            [-1 / 4, 0, 1 / 4],
+            [-1 / 2, -1 / 6, 1 / 6, 1 / 2],
+            [-1 / 2, -1 / 4, 0, 1 / 4, 1 / 2],
+            [-5 / 8, - 3 / 8, -1 / 8, 1 / 8, 3 / 8, 5 / 8],
+        ];
+        const maxCopies = offsets[offsets.length - 1].length;
+        const oldCountX = this._offsets[0].length;
+        const oldCountY = this._offsets.length;
+        const increaseX = direction == 'horizontal' ? 1 : 0;
+        const increaseY = direction == 'vertical' ? 1 : 0;
+        const countX = Math.min(maxCopies, oldCountX + increaseX);
+        const countY = Math.min(maxCopies, oldCountY + increaseY);
+        const maxX = paper.view.size.width;
+        const maxY = paper.view.size.height;
+        const yOffsets = [];
+        for (let y = 0; y < countY; y++) {
+            const xOffsets = [];
+            for (let x = 0; x < countX; x++) {
+                const newX = offsets[countX][x] * maxX;
+                const newY = offsets[countY][y] * maxY;
+                xOffsets.push(new paper.Point(newX, newY));
+            }
+            yOffsets.push(xOffsets);
+        }
+        this._offsets = yOffsets;
     }
 
-    _duplicateWorm(direction) {
+    _duplicateWorms(direction) {
         if (this._paths.length) {
-            if (direction == 'horizontal') {
-                this._addXoffset();
-                this._yOffsets.forEach((offset, index) => {
+            this._addOffset(direction);
+            const offsetsFlat = this._offsets.flat(1);
+            offsetsFlat.forEach((offset, index) => {
+                if (index < this._paths.length) {
+                    this._paths[index].position = offset;
+                } else {
                     const clonePath = this._paths[0].clone();
-                    // clonePath.name = 'xCopy';
-                    // const tempOffset = new Point(offset.x, this._paths[0].position.y);
                     clonePath.position = offset;
                     this._paths.push(clonePath);
-                });
-            }
-            if (direction == 'vertical') {
-
-            }
-            const group = new paper.Group({
-                children: this._paths,
-                position: paper.view.center
+                }
             });
         }
-        console.log(paper, paper.view.viewSize.width);
     }
+
+    _duplicateDraw() { }
 
 }
