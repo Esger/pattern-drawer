@@ -166,6 +166,8 @@ export class TheCanvas {
             [-1 / 2, -1 / 6, 1 / 6, 1 / 2],
             [-1 / 2, -1 / 4, 0, 1 / 4, 1 / 2],
             [-5 / 8, - 3 / 8, -1 / 8, 1 / 8, 3 / 8, 5 / 8],
+            [-6 / 9, - 4 / 9, -2 / 9, 0, 2 / 9, 4 / 9, 6 / 9],
+            [-7 / 10, - 5 / 10, -3 / 10, -1 / 10, 1 / 10, 3 / 10, 5 / 10, 7 / 10],
         ];
         const maxCopies = offsets[offsets.length - 1].length;
         const oldCountX = this._offsets[0].length;
