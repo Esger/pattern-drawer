@@ -32,6 +32,8 @@ export class TheCanvas {
                     break;
             }
         });
+        this._duplicates = 0;
+        this._autoDuplicate();
     }
 
     detached() {
@@ -39,6 +41,18 @@ export class TheCanvas {
         this._wormSubscription.dispose();
         this._eraseSubscription.dispose();
         this._duplicateSubscription.dispose();
+    }
+
+    _autoDuplicate() {
+        setTimeout(() => {
+            if (this._duplicates < 3) {
+                this._duplicateWorms('horizontal');
+                this._duplicateWorms('horizontal');
+                this._duplicateWorms('vertical');
+                this._duplicates++;
+                this._autoDuplicate();
+            }
+        }, 100);
     }
 
     _initCanvas() {
