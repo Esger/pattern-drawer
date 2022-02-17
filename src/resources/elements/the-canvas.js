@@ -16,6 +16,7 @@ export class TheCanvas {
     }
 
     attached() {
+        this._isMobile = sessionStorage.getItem('isMobile') == 'true';
         this._initCanvas();
         this._worm();
         // this._duplicateWorms('horizontal');
@@ -33,6 +34,14 @@ export class TheCanvas {
             }
         });
         this._duplicates = 0;
+        this._maxDuplicates = {
+            x: this._isMobile ? 4 : 4,
+            y: this._isMobile ? 3 : 3,
+        };
+        this._orientatation = Math.max(window.innerWidth / window.innerHeight) > 1 ? 'horizontal' : 'vertical';
+        const temp = this._maxDuplicates.x;
+        this._maxDuplicates.x = this._maxDuplicates.y;
+        this._maxDuplicates.y = temp;
         this._autoDuplicate();
     }
 
@@ -44,15 +53,16 @@ export class TheCanvas {
     }
 
     _autoDuplicate() {
-        setTimeout(() => {
-            if (this._duplicates < 3) {
-                this._duplicateWorms('horizontal');
-                this._duplicateWorms('horizontal');
+        for (let i = 0; i < this._maxDuplicates.y; i++) {
+            setTimeout(_ => {
                 this._duplicateWorms('vertical');
-                this._duplicates++;
-                this._autoDuplicate();
-            }
-        }, 100);
+            }, i * 100);
+        }
+        for (let i = 0; i < this._maxDuplicates.x; i++) {
+            setTimeout(() => {
+                this._duplicateWorms('horizontal');
+            }, i * 100 + 50);
+        }
     }
 
     _initCanvas() {
@@ -100,17 +110,17 @@ export class TheCanvas {
         this._erase();
         this._mode = 'worm';
         // The distance between the points:
-        const segmentLength = 35;
+        const segmentLength = this._isMobile ? 20 : 35;
 
         let path;
 
         const addWormPath = () => {
             // The amount of points in the path:
-            const points = 25;
+            const points = this.isMobile ? 15 : 25;
             if (!path) {
                 path = new paper.Path({
                     strokeColor: 'crimson',
-                    strokeWidth: 20,
+                    strokeWidth: this._isMobile ? 10 : 20,
                     strokeCap: 'round'
                 });
                 var start = paper.view.center.divide([11, 1]);
@@ -143,23 +153,24 @@ export class TheCanvas {
             });
         }
 
+        const toggleActivation = (selected) => {
+            this._paths.forEach(path => {
+                path.fullySelected = selected;
+                path.strokeColor = selected ? '#e08285' : '#e4141b';
+            });
+        }
+
         this._wormTool.onMouseDown = _ => {
-            if (this._paths.length) {
-                this._paths.forEach(path => {
-                    path.fullySelected = true;
-                    path.strokeColor = '#e08285';
-                })
+            if (this._paths.length && !this._isMobile) {
+                toggleActivation(true);
             } else {
                 addWormPath();
             }
         }
 
         this._wormTool.onMouseUp = _ => {
-            if (this._paths.length) {
-                this._paths.forEach(path => {
-                    path.fullySelected = false;
-                    path.strokeColor = '#e4141b';
-                })
+            if (this._paths.length && !this._isMobile) {
+                toggleActivation(false);
             }
         }
     }
