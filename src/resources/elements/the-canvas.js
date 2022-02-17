@@ -35,8 +35,8 @@ export class TheCanvas {
         });
         this._duplicates = 0;
         this._maxDuplicates = {
-            x: this._isMobile ? 4 : 4,
-            y: this._isMobile ? 3 : 3,
+            x: this._isMobile ? 5 : 4,
+            y: this._isMobile ? 3 : 4,
         };
         this._orientatation = Math.max(window.innerWidth / window.innerHeight) > 1 ? 'horizontal' : 'vertical';
         const temp = this._maxDuplicates.x;
