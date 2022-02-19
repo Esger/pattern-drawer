@@ -9,6 +9,7 @@ export class TheCanvas {
     _paths = [];
     _offsets = [];
     _mode = '';
+    _defaultColor = 'crimson';
 
     constructor(eventAggregator) {
         this._eventAggregator = eventAggregator;
@@ -121,9 +122,17 @@ export class TheCanvas {
             const points = this.isMobile ? 15 : 25;
             if (!path) {
                 path = new paper.Path({
-                    strokeColor: 'crimson',
-                    strokeWidth: this._isMobile ? 10 : 20,
-                    strokeCap: 'round'
+                    strokeColor: this._defaultColor,
+                    strokeWidth: this._isMobile ? 10 : 15,
+                    strokeCap: 'round',
+                    // shadowColor: '#00ff00cc',
+                    // shadowBlur: 10,
+                    // opacity: .71,
+                    // shadowBlur: 20,
+                    // set a fill color to make sure that the shadow is displayed
+                    // fillColor: 'white',
+                    // use blendmode to hide the fill and only see the shadow
+                    // blendMode: 'multiply',
                 });
                 var start = paper.view.center.divide([11, 1]);
                 for (var i = 0; i < points; i++)
@@ -137,7 +146,7 @@ export class TheCanvas {
         const toggleActivation = (selected) => {
             this._paths.forEach(path => {
                 path.fullySelected = selected;
-                path.strokeColor = selected ? '#e08285' : '#e4141b';
+                path.opacity = selected ? 0.5 : 0.9;
             });
         }
 
