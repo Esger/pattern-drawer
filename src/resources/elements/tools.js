@@ -2,6 +2,8 @@ import { inject } from 'aurelia-framework';
 import { EventAggregator } from 'aurelia-event-aggregator';
 @inject(EventAggregator)
 export class ToolsCustomElement {
+    lineColor = 'crimson';
+
     constructor(eventAggregator) {
         this._eventAggregator = eventAggregator;
         this.isDrawing = false;
@@ -41,6 +43,10 @@ export class ToolsCustomElement {
 
     duplicate(direction) {
         this._eventAggregator.publish('duplicate', { direction: direction });
+    }
+
+    changeLineColor() {
+        this._eventAggregator.publish('lineColor', this.lineColor);
     }
 
 }

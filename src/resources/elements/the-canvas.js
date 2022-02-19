@@ -34,6 +34,10 @@ export class TheCanvas {
                     break;
             }
         });
+        this._lineColorSubscription = this._eventAggregator.subscribe('lineColor', color => {
+            this._defaultColor = color;
+            this._paths.forEach(path => path.strokeColor = color);
+        });
         this._duplicates = 0;
         this._maxDuplicates = {
             x: this._isMobile ? 5 : 4,
@@ -51,6 +55,7 @@ export class TheCanvas {
         this._wormSubscription.dispose();
         this._eraseSubscription.dispose();
         this._duplicateSubscription.dispose();
+        this._lineColorSubscription.dispose();
     }
 
     _autoDuplicate() {
