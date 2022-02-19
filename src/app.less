@@ -1,8 +1,17 @@
 html,
 body {
-    height          : 100%;
-    --black         : #333;
-    --white         : antiquewhite;
+    height: 100%;
+
+    @media (prefers-color-scheme: dark) {
+        --black: #333;
+        --white: antiquewhite;
+    }
+
+    @media (prefers-color-scheme: light) {
+        --black: antiquewhite;
+        --white: #333;
+    }
+
     background-color: var(--black);
 }
 
