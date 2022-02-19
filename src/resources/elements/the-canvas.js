@@ -9,6 +9,7 @@ export class TheCanvas {
     _paths = [];
     _offsets = [];
     _mode = '';
+    _defaultColor = 'crimson';
 
     constructor(eventAggregator) {
         this._eventAggregator = eventAggregator;
@@ -16,6 +17,7 @@ export class TheCanvas {
     }
 
     attached() {
+        this._isMobile = sessionStorage.getItem('isMobile') == 'true';
         this._initCanvas();
         this._worm();
         // this._duplicateWorms('horizontal');
@@ -32,6 +34,20 @@ export class TheCanvas {
                     break;
             }
         });
+        this._lineColorSubscription = this._eventAggregator.subscribe('lineColor', color => {
+            this._defaultColor = color;
+            this._paths.forEach(path => path.strokeColor = color);
+        });
+        this._duplicates = 0;
+        this._maxDuplicates = {
+            x: this._isMobile ? 5 : 4,
+            y: this._isMobile ? 3 : 4,
+        };
+        this._orientatation = Math.max(window.innerWidth / window.innerHeight) > 1 ? 'horizontal' : 'vertical';
+        const temp = this._maxDuplicates.x;
+        this._maxDuplicates.x = this._maxDuplicates.y;
+        this._maxDuplicates.y = temp;
+        this._autoDuplicate();
     }
 
     detached() {
@@ -39,6 +55,20 @@ export class TheCanvas {
         this._wormSubscription.dispose();
         this._eraseSubscription.dispose();
         this._duplicateSubscription.dispose();
+        this._lineColorSubscription.dispose();
+    }
+
+    _autoDuplicate() {
+        for (let i = 0; i < this._maxDuplicates.y; i++) {
+            setTimeout(_ => {
+                this._duplicateWorms('vertical');
+            }, i * 100);
+        }
+        for (let i = 0; i < this._maxDuplicates.x; i++) {
+            setTimeout(() => {
+                this._duplicateWorms('horizontal');
+            }, i * 100 + 50);
+        }
     }
 
     _initCanvas() {
@@ -85,19 +115,29 @@ export class TheCanvas {
     _worm() {
         this._erase();
         this._mode = 'worm';
+        this._distance = new Point([0, 0]);
+        this._previousPoint = new Point([0, 0]);
         // The distance between the points:
-        const segmentLength = 35;
+        const segmentLength = this._isMobile ? 20 : 35;
 
         let path;
 
         const addWormPath = () => {
             // The amount of points in the path:
-            const points = 25;
+            const points = this.isMobile ? 15 : 25;
             if (!path) {
                 path = new paper.Path({
-                    strokeColor: 'crimson',
-                    strokeWidth: 20,
-                    strokeCap: 'round'
+                    strokeColor: this._defaultColor,
+                    strokeWidth: this._isMobile ? 10 : 15,
+                    strokeCap: 'round',
+                    // shadowColor: '#00ff00cc',
+                    // shadowBlur: 10,
+                    // opacity: .71,
+                    // shadowBlur: 20,
+                    // set a fill color to make sure that the shadow is displayed
+                    // fillColor: 'white',
+                    // use blendmode to hide the fill and only see the shadow
+                    // blendMode: 'multiply',
                 });
                 var start = paper.view.center.divide([11, 1]);
                 for (var i = 0; i < points; i++)
@@ -108,16 +148,26 @@ export class TheCanvas {
             }
         }
 
+        const toggleActivation = (selected) => {
+            this._paths.forEach(path => {
+                path.fullySelected = selected;
+                path.opacity = selected ? 0.5 : 0.9;
+            });
+        }
+
         addWormPath();
 
         this._wormTool = this._wormTool || new paper.Tool();
         this._wormTool.activate();
 
         this._wormTool.onMouseMove = (event) => {
+            const delta = event.point.subtract(this._previousPoint);
+            this._distance = this._distance.add(delta);
+
             const offsetsFlat = this._offsets.flat(1);
             offsetsFlat.forEach((offset, index) => {
                 const path = this._paths[index];
-                path.firstSegment.point = event.point.add(offset);
+                path.firstSegment.point = offset.add(this._distance);
                 for (let i = 0; i < path.segments.length - 1; i++) {
                     const segment = path.segments[i];
                     const nextSegment = segment.next;
@@ -127,25 +177,24 @@ export class TheCanvas {
                 }
                 path.smooth({ type: 'continuous' });
             });
+
+            this._previousPoint = event.point;
         }
 
-        this._wormTool.onMouseDown = _ => {
-            if (this._paths.length) {
-                this._paths.forEach(path => {
-                    path.fullySelected = true;
-                    path.strokeColor = '#e08285';
-                })
+        this._wormTool.onMouseDown = (event) => {
+            if (this._isMobile) {
+                // create trackpad like experience.
+                this._previousPoint = event.point;
             } else {
-                addWormPath();
+                if (this._paths.length) {
+                    toggleActivation(true);
+                }
             }
         }
 
-        this._wormTool.onMouseUp = _ => {
-            if (this._paths.length) {
-                this._paths.forEach(path => {
-                    path.fullySelected = false;
-                    path.strokeColor = '#e4141b';
-                })
+        this._wormTool.onMouseUp = (event) => {
+            if (!this._isMobile && this._paths.length) {
+                toggleActivation(false);
             }
         }
     }

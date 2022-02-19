@@ -1,10 +1,15 @@
-.tools {
+tools {
     position      : absolute;
     right         : 0;
     top           : 0;
     display       : flex;
     flex-direction: column;
     z-index       : 1;
+}
+
+.tools {
+    display       : flex;
+    flex-direction: column;
     opacity       : 1;
     transition    : opacity 250ms ease;
 
@@ -14,6 +19,7 @@
 }
 
 .tools__button {
+    position : relative;
     padding  : 1rem;
     margin   : 0 1rem;
     font-size: 1.5rem;
@@ -21,6 +27,10 @@
 
     div {
         position: relative;
+    }
+
+    .tools & {
+        padding: 0.5rem 1rem;
     }
 
     &.tools__button--duplicateHorizontal div {
@@ -35,4 +45,15 @@
         opacity: 0.5;
         cursor : auto;
     }
+}
+
+.tools__button--toggleTools {
+    font-family: Bungee Outline;
+    color      : var(--white);
+}
+
+.colorInput {
+    position: absolute;
+    inset   : 0;
+    opacity : 0;
 }

@@ -1,15 +1,19 @@
 <template>
     <require from="./tools.css"></require>
+    <button type="button"
+            class="tools__button tools__button--toggleTools"
+            title="Tools"
+            click.delegate="toggleTools()">=</button>
     <div class="tools ${toolsVisible ? '' : 'hidden'}">
-        <button type="button"
+        <!-- <button type="button"
                 class="tools__button ${!isDrawing ? 'tools__button--active' : ''}"
                 title="Worm"
-                click.delegate="isDrawing && worm()">🪱</button>
+                click.delegate="isDrawing && worm()">🪱</button> -->
         <!-- <button type="button"
                 class="tools__button ${isDrawing ? 'tools__button--active' : ''}"
                 title="Draw"
                 click.delegate="!isDrawing && draw()">✏️</button> -->
-        <button type="button"
+        <!-- <button type="button"
                 class="tools__button"
                 title="Erase"
                 click.delegate="erase()">💊</button>
@@ -20,6 +24,15 @@
         <button type="button"
                 class="tools__button tools__button--duplicateVertical"
                 title="duplicate horizontally"
-                click.delegate="duplicate('vertical')"><div>✂️</div></button>
+                click.delegate="duplicate('vertical')"><div>✂️</div></button> -->
+        <button type="button"
+                class="tools__button tools__button--color"
+                title="line color">
+                🎨
+                <input class="colorInput" 
+                    type="color" 
+                    input.delegate="changeLineColor()"
+                    value.bind="lineColor">
+        </button>
     </div>
 </template>
