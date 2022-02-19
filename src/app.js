@@ -4,7 +4,12 @@ export class App {
     constructor(eventAggregator, keyInputService) {
         this._detectTouchDevice();
         const googleFont = document.querySelectorAll('.googleFont')[0];
-        googleFont.addEventListener('load', _ => this._showTitle(), { once: true });
+        this._fontIsReady();
+    }
+
+    _fontIsReady = async () => {
+        await document.fonts.ready;
+        this.showTitle();
     }
 
     _detectTouchDevice() {
