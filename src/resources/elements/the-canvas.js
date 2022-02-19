@@ -109,6 +109,8 @@ export class TheCanvas {
     _worm() {
         this._erase();
         this._mode = 'worm';
+        this._distance = new Point([0, 0]);
+        this._previousPoint = new Point([0, 0]);
         // The distance between the points:
         const segmentLength = this._isMobile ? 20 : 35;
 
@@ -132,16 +134,26 @@ export class TheCanvas {
             }
         }
 
+        const toggleActivation = (selected) => {
+            this._paths.forEach(path => {
+                path.fullySelected = selected;
+                path.strokeColor = selected ? '#e08285' : '#e4141b';
+            });
+        }
+
         addWormPath();
 
         this._wormTool = this._wormTool || new paper.Tool();
         this._wormTool.activate();
 
         this._wormTool.onMouseMove = (event) => {
+            const delta = event.point.subtract(this._previousPoint);
+            this._distance = this._distance.add(delta);
+
             const offsetsFlat = this._offsets.flat(1);
             offsetsFlat.forEach((offset, index) => {
                 const path = this._paths[index];
-                path.firstSegment.point = event.point.add(offset);
+                path.firstSegment.point = offset.add(this._distance);
                 for (let i = 0; i < path.segments.length - 1; i++) {
                     const segment = path.segments[i];
                     const nextSegment = segment.next;
@@ -151,25 +163,23 @@ export class TheCanvas {
                 }
                 path.smooth({ type: 'continuous' });
             });
+
+            this._previousPoint = event.point;
         }
 
-        const toggleActivation = (selected) => {
-            this._paths.forEach(path => {
-                path.fullySelected = selected;
-                path.strokeColor = selected ? '#e08285' : '#e4141b';
-            });
-        }
-
-        this._wormTool.onMouseDown = _ => {
-            if (this._paths.length && !this._isMobile) {
-                toggleActivation(true);
+        this._wormTool.onMouseDown = (event) => {
+            if (this._isMobile) {
+                // create trackpad like experience.
+                this._previousPoint = event.point;
             } else {
-                addWormPath();
+                if (this._paths.length) {
+                    toggleActivation(true);
+                }
             }
         }
 
-        this._wormTool.onMouseUp = _ => {
-            if (this._paths.length && !this._isMobile) {
+        this._wormTool.onMouseUp = (event) => {
+            if (!this._isMobile && this._paths.length) {
                 toggleActivation(false);
             }
         }
