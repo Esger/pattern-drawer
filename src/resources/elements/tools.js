@@ -10,21 +10,15 @@ export class ToolsCustomElement {
     }
 
     attached() {
-        this.showTools();
-        this.hideTools(5000);
-        $('.tools__button').on('mouseenter', _ => this.showTools());
-        $('.tools__button').on('mouseleave', _ => this.hideTools(500));
+        this.hideTools();
     }
 
-    hideTools(timeout) {
-        this.hideTimeoutHandle = setTimeout(() => {
-            this.toolsVisible = false;
-        }, timeout);
+    toggleTools() {
+        this.toolsVisible = !this.toolsVisible;
     }
 
-    showTools() {
-        clearTimeout(this.hideTimeoutHandle);
-        this.toolsVisible = true;
+    hideTools() {
+        this.toolsVisible = false;
     }
 
     draw() {

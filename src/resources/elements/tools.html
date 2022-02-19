@@ -1,5 +1,9 @@
 <template>
     <require from="./tools.css"></require>
+    <button type="button"
+            class="tools__button tools__button--toggleTools"
+            title="Tools"
+            click.delegate="toggleTools()">=</button>
     <div class="tools ${toolsVisible ? '' : 'hidden'}">
         <!-- <button type="button"
                 class="tools__button ${!isDrawing ? 'tools__button--active' : ''}"
