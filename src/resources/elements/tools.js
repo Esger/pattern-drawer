@@ -7,18 +7,27 @@ export class ToolsCustomElement {
     constructor(eventAggregator) {
         this._eventAggregator = eventAggregator;
         this.isDrawing = false;
+        this.visibility = {
+            tools: false,
+            repetitions: false,
+        }
+        this.repetitions = {
+            x: 1,
+            y: 1
+        }
     }
 
     attached() {
         this.hideTools();
+        this.setrepetitions();
     }
 
-    toggleTools() {
-        this.toolsVisible = !this.toolsVisible;
+    toggleVisibility(item) {
+        this.visibility[item] = !this.visibility[item];
     }
 
     hideTools() {
-        this.toolsVisible = false;
+        this.visibility.tools = false;
     }
 
     draw() {
@@ -35,8 +44,12 @@ export class ToolsCustomElement {
         this._eventAggregator.publish('erase');
     }
 
-    duplicate(direction) {
-        this._eventAggregator.publish('duplicate', { direction: direction });
+    setrepetitions() {
+        const repetitions = {
+            x: parseInt(this.repetitions.x, 10),
+            y: parseInt(this.repetitions.y, 10)
+        }
+        this._eventAggregator.publish('repetitions', repetitions);
     }
 
     changeLineColor() {

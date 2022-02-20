@@ -12,10 +12,11 @@ tools {
     flex-direction: column;
     opacity       : 1;
     transition    : opacity 250ms ease;
+}
 
-    &.hidden {
-        opacity: 0;
-    }
+.hidden {
+    opacity       : 0 !important;
+    pointer-events: none;
 }
 
 .tools__button {
@@ -50,6 +51,36 @@ tools {
 .tools__button--toggleTools {
     font-family: Bungee Outline;
     color      : var(--white);
+    text-align : center;
+}
+
+.tools__button--grid {
+    .repetitions {
+        position  : absolute;
+        right     : calc(~'100% + 1rem');
+        top       : 1rem;
+        opacity   : 1;
+        transition: opacity 250ms ease;
+
+        input {
+            position        : absolute;
+            background-color: var(--white);
+            box-shadow      : inset 0 0 0 5px var(--black);
+            border-radius   : 1in;
+        }
+    }
+
+    .repetitions__x {
+        right: 0;
+        top  : 0;
+    }
+
+    .repetitions__y {
+        transform       : rotate(-90deg);
+        transform-origin: top right;
+        top             : 1rem;
+        right           : 0;
+    }
 }
 
 .colorInput {

@@ -7,7 +7,8 @@
         "elements": "resources/elements",
         "attributes": "resources/attributes",
         "valueConverters": "resources/value-converters",
-        "bindingBehaviors": "resources/binding-behaviors"
+        "bindingBehaviors": "resources/binding-behaviors",
+        "services": "resources/services"
     },
     "transpiler": {
         "id": "babel",
