@@ -1,0 +1,56 @@
+<template>
+    <require from="./tools.css"></require>
+    <button type="button"
+            class="tools__button tools__button--toggleTools"
+            title="Tools"
+            click.delegate="toggleVisibility('tools')">=</button>
+    <div class="tools ${visibility.tools ? '' : 'hidden'}">
+        <button type="button"
+                class="tools__button tools__button--grid"
+                title="repetitions"
+                click.delegate="toggleVisibility('repetitions')">
+                🌐
+        </button>
+        <div class="repetitions ${visibility.repetitions ? '' : 'hidden'}">
+            <input type="checkbox"
+                name="linkRepetions"
+                class="repetitions__link"
+                checked.bind="visibility.repetitionsY">
+            <input type="range"
+                class="repetitions__x"
+                min="1"
+                max="10"
+                step="1"
+                input.delegate="setrepetitions()"
+                value.bind="repetitions.x">
+            <input type="range"
+                class="repetitions__y ${visibility.repetitionsY ? '' : 'hidden'}"
+                min="1"
+                max="10"
+                step="1"
+                input.delegate="setrepetitions()"
+                value.bind="repetitions.y">
+        </div>
+        <!-- <button type="button"
+                class="tools__button ${!isDrawing ? 'tools__button--active' : ''}"
+                title="Worm"
+                click.delegate="isDrawing && worm()">🪱</button> -->
+        <!-- <button type="button"
+                class="tools__button ${isDrawing ? 'tools__button--active' : ''}"
+                title="Draw"
+                click.delegate="!isDrawing && draw()">✏️</button> -->
+        <!-- <button type="button"
+                class="tools__button"
+                title="Erase"
+                click.delegate="erase()">💊</button> -->
+        <button type="button"
+                class="tools__button tools__button--color"
+                title="line color">
+                🎨
+                <input class="colorInput" 
+                    type="color" 
+                    input.delegate="changeLineColor()"
+                    value.bind="lineColor">
+        </button>
+    </div>
+</template>

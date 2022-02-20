@@ -1,0 +1,13 @@
+<template>
+    <require from="the-new-css-reset/reset.css"></require>
+    <require from="./app.css"></require>
+    <require from="elements/the-canvas"></require>
+    <require from="elements/tools"></require>
+    <h1 class="${titleIsVisible ? '' : 'hidden'}"
+        mouseover.delegate="!isMobile && showTitle()">
+        <template if.bind="isMobile">${message}</template>
+        <a else href="http://ashware.nl/webware/">${message}</a>
+    </h1>
+    <the-canvas containerless></the-canvas>
+    <tools></tools>
+</template>
