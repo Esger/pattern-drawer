@@ -1,19 +1,25 @@
+import { inject } from 'aurelia-framework';
+import { EventAggregator } from 'aurelia-event-aggregator';
+@inject(EventAggregator)
 export class WormService {
     _wormTool;
     _paths = [];
     _offsets = [];
     _defaultColor = 'crimson';
+    _minStrokeWidth = 1;
 
-    constructor() {
+    constructor(eventAggregator) {
+        this._eventAggregator = eventAggregator;
         this._isMobile = sessionStorage.getItem('isMobile') == 'true';
-        this._maxDuplicates = {
-            x: this._isMobile ? 3 : 4,
-            y: this._isMobile ? 5 : 4,
-        };
-        // dit alleen doen bij orientation-change
-        // const temp = this._maxDuplicates.x;
-        // this._maxDuplicates.x = this._maxDuplicates.y;
-        // this._maxDuplicates.y = temp;
+        this._baseLineWidth = this.isMobile ? 15 : 20;
+        this._lineColorSubscription = this._eventAggregator.subscribe('lineColor', color => {
+            this._defaultColor = color;
+            this._paths.forEach(path => path.strokeColor = color);
+        });
+    }
+
+    detached() {
+        this._lineColorSubscription.dispose();
     }
 
     _erase() {
@@ -39,7 +45,7 @@ export class WormService {
             if (!path) {
                 path = new paper.Path({
                     strokeColor: this._defaultColor,
-                    strokeWidth: this._isMobile ? 10 : 15,
+                    strokeWidth: this._baseLineWidth,
                     strokeCap: 'round',
                     // shadowColor: '#00ff00cc',
                     // shadowBlur: 10,
@@ -110,25 +116,28 @@ export class WormService {
     }
 
     setRepetitions(repetitions) {
-        const offsetSize = new paper.Point(paper.view.size.width / repetitions.x, paper.view.size.height / repetitions.y);
-        const relativeSize = new paper.Point([1 / repetitions.x, 1 / repetitions.y]);
         // two extra repetitions for 0 and max
         const extraRepetitions = new paper.Point(repetitions).add(2);
-        // extra offset to center even amounts of copies around cursor
-        const relativeShiftX = repetitions.x % 2 == 0 ? -relativeSize.x / 2 : 0;
-        const relativeShiftY = repetitions.y % 2 == 0 ? -relativeSize.y / 2 : 0;
+        const spaces = extraRepetitions.subtract(1);
+        const canvasWidth = new paper.Point(paper.view.size);
+        const offsetSize = canvasWidth.divide(spaces);
+        const relativeSize = new paper.Point([1, 1]).divide(spaces);
         const yOffsets = [];
+
+        // calculate offsets array
         for (let y = 0; y < extraRepetitions.y; y++) {
             const xOffsets = [];
             for (let x = 0; x < extraRepetitions.x; x++) {
-                const point = new paper.Point([
-                    (x * relativeSize.x + relativeShiftX - 1) * offsetSize.x / 2,
-                    (y * relativeSize.y + relativeShiftY - 1) * offsetSize.y / 2
-                ]);
+                let point = relativeSize.clone();
+                point = point.multiply([x, y])
+                point = point.subtract(1 / 2);
+                point = point.multiply(canvasWidth);
                 xOffsets.push(point);
             }
             yOffsets.push(xOffsets);
         }
+
+        // position paths
         const offsetsFlat = yOffsets.flat(1);
         offsetsFlat.forEach((offset, index) => {
             if (index < this._paths.length) {
@@ -139,6 +148,17 @@ export class WormService {
                 this._paths.push(clonePath);
             }
         });
+
+        // remove extraneous paths
+        while (this._paths.length > offsetsFlat.length) {
+            const lastPath = this._paths.pop();
+            lastPath.remove();
+        }
+
+        // adjust path widths
+        const newStrokeWidth = Math.max(this._baseLineWidth - this._paths.flat().length / 2, this._minStrokeWidth);
+        this._paths.forEach(path => path.strokeWidth = newStrokeWidth);
+
         this._offsets = yOffsets;
 
         console.table(yOffsets);

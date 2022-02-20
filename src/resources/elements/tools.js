@@ -10,6 +10,7 @@ export class ToolsCustomElement {
         this.visibility = {
             tools: false,
             repetitions: false,
+            repetitionsY: false,
         }
         this.repetitions = {
             x: 1,
@@ -19,7 +20,7 @@ export class ToolsCustomElement {
 
     attached() {
         this.hideTools();
-        this.setrepetitions();
+        setTimeout(() => this.setrepetitions());
     }
 
     toggleVisibility(item) {
@@ -47,7 +48,7 @@ export class ToolsCustomElement {
     setrepetitions() {
         const repetitions = {
             x: parseInt(this.repetitions.x, 10),
-            y: parseInt(this.repetitions.y, 10)
+            y: parseInt(this.visibility.repetitionsY ? this.repetitions.y : this.repetitions.x, 10)
         }
         this._eventAggregator.publish('repetitions', repetitions);
     }

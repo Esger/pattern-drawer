@@ -9,24 +9,28 @@
                 class="tools__button tools__button--grid"
                 title="repetitions"
                 click.delegate="toggleVisibility('repetitions')">
-                <div class="repetitions ${visibility.repetitions ? '' : 'hidden'}">
-                    <input type="range"
-                        class="repetitions__x"
-                        min="1"
-                        max="10"
-                        step="1"
-                        input.delegate="setrepetitions()"
-                        value.bind="repetitions.x">
-                    <input type="range"
-                        class="repetitions__y"
-                        min="1"
-                        max="10"
-                        step="1"
-                        input.delegate="setrepetitions()"
-                        value.bind="repetitions.y">
-                </div>
                 🌐
         </button>
+        <div class="repetitions ${visibility.repetitions ? '' : 'hidden'}">
+            <input type="checkbox"
+                name="linkRepetions"
+                class="repetitions__link"
+                checked.bind="visibility.repetitionsY">
+            <input type="range"
+                class="repetitions__x"
+                min="1"
+                max="10"
+                step="1"
+                input.delegate="setrepetitions()"
+                value.bind="repetitions.x">
+            <input type="range"
+                class="repetitions__y ${visibility.repetitionsY ? '' : 'hidden'}"
+                min="1"
+                max="10"
+                step="1"
+                input.delegate="setrepetitions()"
+                value.bind="repetitions.y">
+        </div>
         <!-- <button type="button"
                 class="tools__button ${!isDrawing ? 'tools__button--active' : ''}"
                 title="Worm"

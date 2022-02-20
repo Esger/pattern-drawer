@@ -32,12 +32,7 @@ export class TheCanvas {
                     break;
             }
         });
-        this._lineColorSubscription = this._eventAggregator.subscribe('lineColor', color => {
-            this._defaultColor = color;
-            this._paths.forEach(path => path.strokeColor = color);
-        });
         this._orientatation = Math.max(window.innerWidth / window.innerHeight) > 1 ? 'horizontal' : 'vertical';
-        // this._wormService.autoDuplicate();
     }
 
     detached() {
