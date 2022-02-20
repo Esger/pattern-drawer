@@ -19,16 +19,18 @@ export class TheCanvas {
         this._isMobile = sessionStorage.getItem('isMobile') == 'true';
         this._initCanvas();
         this._wormService.worm();
-        this._drawSubscription = this._eventAggregator.subscribe('draw', _ => this._draw());
-        this._wormSubscription = this._eventAggregator.subscribe('worm', _ => this._worm());
-        this._eraseSubscription = this._eventAggregator.subscribe('erase', _ => this._erase());
+        this._drawSubscription = this._eventAggregator.subscribe('draw', _ => this._drawService.draw());
+        this._wormSubscription = this._eventAggregator.subscribe('worm', _ => {
+            this._wormService.worm();
+            this._wormService.setRepetitions([1, 1]);
+        });
         this._distanceSubscription = this._eventAggregator.subscribe('repetitions', repetitions => {
             switch (this._mode) {
                 case 'worm':
                     this._wormService.setRepetitions(repetitions);
                     break;
                 case 'draw':
-                    this._duplicateDraw(data.direction)
+                    this._drawService.setRepetitions(repetitions);
                     break;
             }
         });
@@ -38,7 +40,6 @@ export class TheCanvas {
     detached() {
         this._drawSubscription.dispose();
         this._wormSubscription.dispose();
-        this._eraseSubscription.dispose();
         this._distanceSubscription.dispose();
         this._lineColorSubscription.dispose();
     }

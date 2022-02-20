@@ -1,19 +1,6 @@
-export class DrawService {
+import { AbstractDrawService } from 'services/abstract-draw-service'
+export class DrawService extends AbstractDrawService {
     _drawTool;
-    _paths = [];
-    _offsets = [];
-    _defaultColor = 'crimson';
-
-    constructor() {
-
-    }
-
-    _erase() {
-        paper.project.activeLayer.removeChildren();
-        this._paths = [];
-        this._xOffsets = [];
-        this._yOffsets = [];
-    }
 
     draw() {
         this._erase();
@@ -49,7 +36,4 @@ export class DrawService {
             // console.log(paper);
         }
     }
-
-    _duplicateDraw() { }
-
 }

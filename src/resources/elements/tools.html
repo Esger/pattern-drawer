@@ -31,18 +31,19 @@
                 input.delegate="setrepetitions()"
                 value.bind="repetitions.y">
         </div>
-        <!-- <button type="button"
+        <button type="button"
                 class="tools__button ${!isDrawing ? 'tools__button--active' : ''}"
                 title="Worm"
-                click.delegate="isDrawing && worm()">🪱</button> -->
-        <!-- <button type="button"
+                click.delegate="isDrawing && worm()">🪱</button>
+        <button type="button"
                 class="tools__button ${isDrawing ? 'tools__button--active' : ''}"
                 title="Draw"
-                click.delegate="!isDrawing && draw()">✏️</button> -->
-        <!-- <button type="button"
+                click.delegate="!isDrawing && draw()">✏️</button>
+        <button if.bind="isDrawing"
+                type="button"
                 class="tools__button"
                 title="Erase"
-                click.delegate="erase()">💊</button> -->
+                click.delegate="erase()">💊</button>
         <button type="button"
                 class="tools__button tools__button--color"
                 title="line color">
