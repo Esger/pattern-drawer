@@ -15,12 +15,10 @@ export class AbstractDrawService {
             this._defaultColor = color;
             this._paths.forEach(path => path.strokeColor = color);
         });
-        this._eraseSubscription = this._eventAggregator.subscribe('erase', _ => this._erase());
     }
 
     detached() {
         this._lineColorSubscription.dispose();
-        this._eraseSubscription.dispose();
     }
 
     _erase() {
