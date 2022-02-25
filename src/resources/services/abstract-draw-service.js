@@ -33,7 +33,6 @@ export class AbstractDrawService {
         const extraRepetitions = new paper.Point(repetitions).add(2);
         const spaces = extraRepetitions.subtract(1);
         const canvasWidth = new paper.Point(paper.view.size);
-        const offsetSize = canvasWidth.divide(spaces);
         const relativeSize = new paper.Point([1, 1]).divide(spaces);
         const yOffsets = [];
 
@@ -48,24 +47,6 @@ export class AbstractDrawService {
                 xOffsets.push(point);
             }
             yOffsets.push(xOffsets);
-        }
-
-        // position paths
-        const offsetsFlat = yOffsets.flat(1);
-        offsetsFlat.forEach((offset, index) => {
-            if (index < this._paths.length) {
-                this._paths[index].position = offset;
-            } else {
-                const clonePath = this._paths[0].clone();
-                clonePath.position = offset;
-                this._paths.push(clonePath);
-            }
-        });
-
-        // remove extraneous paths
-        while (this._paths.length > offsetsFlat.length) {
-            const lastPath = this._paths.pop();
-            lastPath.remove();
         }
 
         // adjust path widths

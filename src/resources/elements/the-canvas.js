@@ -19,7 +19,10 @@ export class TheCanvas {
         this._isMobile = sessionStorage.getItem('isMobile') == 'true';
         this._initCanvas();
         this._wormService.worm();
-        this._drawSubscription = this._eventAggregator.subscribe('draw', _ => this._drawService.draw());
+        this._drawSubscription = this._eventAggregator.subscribe('draw', _ => {
+            this._drawService.draw();
+            this._drawService.setRepetitions([1, 1]);
+        });
         this._wormSubscription = this._eventAggregator.subscribe('worm', _ => {
             this._wormService.worm();
             this._wormService.setRepetitions([1, 1]);

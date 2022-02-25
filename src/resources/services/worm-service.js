@@ -87,4 +87,26 @@ export class WormService extends AbstractDrawService {
             }
         }
     }
+
+    setRepetitions(repetitions) {
+        super.setRepetitions(repetitions);
+        // position paths
+        const offsetsFlat = this._offsets.flat(1);
+        offsetsFlat.forEach((offset, index) => {
+            if (index < this._paths.length) {
+                this._paths[index].position = offset;
+            } else {
+                // Er zijn nog geen paden bij drawService
+                const clonePath = this._paths[0].clone();
+                clonePath.position = offset;
+                this._paths.push(clonePath);
+            }
+        });
+
+        // remove extraneous paths
+        while (this._paths.length > offsetsFlat.length) {
+            const lastPath = this._paths.pop();
+            lastPath.remove();
+        }
+    }
 }
