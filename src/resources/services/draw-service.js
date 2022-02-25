@@ -69,6 +69,7 @@ export class DrawService extends AbstractDrawService {
 
     setRepetitions(repetitions) {
         super.setRepetitions(repetitions);
+        this._offsetGroups = [];
         this._offsetsFlat = this._offsets.flat(1);
         this._offsetsFlat.forEach(offset => {
             const pathGroup = new paper.Group();
@@ -77,7 +78,8 @@ export class DrawService extends AbstractDrawService {
     }
 
     _erase() {
-        this._pathsGroup && this._pathsGroup.removeChildren();
         super._erase();
+        this.setRepetitions();
     }
+
 }

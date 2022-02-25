@@ -12,6 +12,7 @@ export class TheCanvas {
         this._eventAggregator = eventAggregator;
         this._wormService = wormService;
         this._drawService = drawService;
+        this._repetitions = [1, 1];
         paper.install(window);
     }
 
@@ -21,13 +22,14 @@ export class TheCanvas {
         this._wormService.worm();
         this._drawSubscription = this._eventAggregator.subscribe('draw', _ => {
             this._drawService.draw();
-            this._drawService.setRepetitions([1, 1]);
+            this._drawService.setRepetitions(this._repetitions);
         });
         this._wormSubscription = this._eventAggregator.subscribe('worm', _ => {
             this._wormService.worm();
-            this._wormService.setRepetitions([1, 1]);
+            this._wormService.setRepetitions(this._repetitions);
         });
         this._distanceSubscription = this._eventAggregator.subscribe('repetitions', repetitions => {
+            this._repetitions = repetitions;
             switch (this._mode) {
                 case 'worm':
                     this._wormService.setRepetitions(repetitions);

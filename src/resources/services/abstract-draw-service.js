@@ -24,11 +24,10 @@ export class AbstractDrawService {
     _erase() {
         paper.project.activeLayer.removeChildren();
         this._paths = [];
-        this._xOffsets = [];
-        this._yOffsets = [];
     }
 
-    setRepetitions(repetitions) {
+    setRepetitions(repetitions = [1, 1]) {
+        this._repetitions = repetitions;
         // two extra repetitions for 0 and max
         const extraRepetitions = new paper.Point(repetitions).add(2);
         const spaces = extraRepetitions.subtract(1);
