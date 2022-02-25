@@ -9,6 +9,8 @@ export class DrawService extends AbstractDrawService {
     constructor(eventAggregator) {
         super(eventAggregator);
         this._eraseSubscription = this._eventAggregator.subscribe('erase', _ => {
+            this._erase();
+            this.setRepetitions();
             this.draw();
         });
     }
@@ -18,8 +20,6 @@ export class DrawService extends AbstractDrawService {
     }
 
     draw() {
-        this._erase();
-        this._mode = 'draw';
         this._drawTool = this._drawTool || new paper.Tool();
         this._drawTool.activate();
         const makeNewPath = (name) => new paper.Path({
@@ -79,7 +79,6 @@ export class DrawService extends AbstractDrawService {
 
     _erase() {
         super._erase();
-        this.setRepetitions();
     }
 
 }

@@ -4,7 +4,6 @@ export class WormService extends AbstractDrawService {
 
     worm() {
         this._erase();
-        this._mode = 'worm';
         this._distance = new Point([0, 0]);
         this._previousPoint = new Point([0, 0]);
         // The distance between the points:

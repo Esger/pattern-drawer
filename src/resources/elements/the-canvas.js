@@ -21,10 +21,12 @@ export class TheCanvas {
         this._initCanvas();
         this._wormService.worm();
         this._drawSubscription = this._eventAggregator.subscribe('draw', _ => {
+            this._mode = 'draw';
             this._drawService.draw();
             this._drawService.setRepetitions(this._repetitions);
         });
         this._wormSubscription = this._eventAggregator.subscribe('worm', _ => {
+            this._mode = 'worm';
             this._wormService.worm();
             this._wormService.setRepetitions(this._repetitions);
         });
