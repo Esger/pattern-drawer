@@ -10,21 +10,25 @@ export class DrawService extends AbstractDrawService {
         super(eventAggregator);
         this._eraseSubscription = this._eventAggregator.subscribe('erase', _ => {
             this._erase();
-            this.setRepetitions();
+            this.setRepetitions(this._repetitions);
             this.draw();
+        });
+        this._lineColorSubscription = this._eventAggregator.subscribe('lineColor', color => {
+            this._defaultColor = color;
         });
     }
 
     detached() {
         this._eraseSubscription.dispose();
+        this._lineColorSubscription.dispose();
     }
 
     draw() {
         this._drawTool = this._drawTool || new paper.Tool();
         this._drawTool.activate();
         const makeNewPath = (name) => new paper.Path({
-            strokeColor: 'crimson',
-            strokeWidth: 20,
+            strokeColor: this._defaultColor || 'crimson',
+            strokeWidth: Math.max(this._baseLineWidth - this._offsetGroups.length / 2, this._minStrokeWidth) || 20,
             strokeCap: 'round',
             name: name
         });
@@ -51,19 +55,18 @@ export class DrawService extends AbstractDrawService {
                     const currentPath = offsetGroup.children[currentPathName + index];
                     const newPoint = new paper.Point(event.point.add(this._offsetsFlat.flat(1)[index]));
                     currentPath.add(newPoint);
-                    console.log(currentPath.name);
                 });
             }
         }
 
         this._drawTool.onMouseUp = (event) => {
             // overeenkomende paden in andere groepen/offsets ook
+            penDown = !penDown;
             this._offsetGroups.forEach((offsetGroup, index) => {
                 const currentPath = offsetGroup.children[currentPathName + index];
                 currentPath.simplify();
             })
             // path.fullySelected = false;
-            // console.log(paper);
         }
     }
 

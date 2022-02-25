@@ -1,6 +1,21 @@
-import { AbstractDrawService } from 'services/abstract-draw-service';
+import { inject } from 'aurelia-framework';
+import { EventAggregator } from 'aurelia-event-aggregator';
+import { AbstractDrawService } from 'services/abstract-draw-service'
+@inject(EventAggregator)
 export class WormService extends AbstractDrawService {
     _wormTool;
+
+    constructor(eventAggregator) {
+        super(eventAggregator);
+        this._lineColorSubscription = this._eventAggregator.subscribe('lineColor', color => {
+            this._defaultColor = color;
+            this._paths.forEach(path => path.strokeColor = color);
+        });
+    }
+
+    detached() {
+        this._lineColorSubscription.dispose();
+    }
 
     worm() {
         this._erase();
@@ -89,6 +104,11 @@ export class WormService extends AbstractDrawService {
 
     setRepetitions(repetitions) {
         super.setRepetitions(repetitions);
+
+        // adjust path widths
+        const newStrokeWidth = Math.max(this._baseLineWidth - this._paths.flat().length / 2, this._minStrokeWidth);
+        this._paths.forEach(path => path.strokeWidth = newStrokeWidth);
+
         // position paths
         const offsetsFlat = this._offsets.flat(1);
         offsetsFlat.forEach((offset, index) => {

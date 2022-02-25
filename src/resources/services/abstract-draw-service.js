@@ -10,15 +10,7 @@ export class AbstractDrawService {
     constructor(eventAggregator) {
         this._eventAggregator = eventAggregator;
         this._isMobile = sessionStorage.getItem('isMobile') == 'true';
-        this._baseLineWidth = this.isMobile ? 15 : 20;
-        this._lineColorSubscription = this._eventAggregator.subscribe('lineColor', color => {
-            this._defaultColor = color;
-            this._paths.forEach(path => path.strokeColor = color);
-        });
-    }
-
-    detached() {
-        this._lineColorSubscription.dispose();
+        this._baseLineWidth = this._isMobile ? 15 : 20;
     }
 
     _erase() {
@@ -48,12 +40,6 @@ export class AbstractDrawService {
             yOffsets.push(xOffsets);
         }
 
-        // adjust path widths
-        const newStrokeWidth = Math.max(this._baseLineWidth - this._paths.flat().length / 2, this._minStrokeWidth);
-        this._paths.forEach(path => path.strokeWidth = newStrokeWidth);
-
         this._offsets = yOffsets;
-
-        console.table(yOffsets);
     }
 }

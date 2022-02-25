@@ -21,6 +21,13 @@ export class ToolsCustomElement {
     attached() {
         this.hideTools();
         setTimeout(() => this.setrepetitions());
+        this._drawSubscription = this._eventAggregator.subscribe('draw', () => this.step = 2);
+        this._wormSubscription = this._eventAggregator.subscribe('worm', () => this.step = 1);
+    }
+
+    detached() {
+        this._drawSubscription.dispose();
+        this._wormSubscription.dispose();
     }
 
     toggleVisibility(item) {

@@ -7,7 +7,7 @@
     <div class="tools ${visibility.tools ? '' : 'hidden'}">
         <button type="button"
                 class="tools__button tools__button--grid"
-                title="repetitions"
+                title="Repetitions"
                 click.delegate="toggleVisibility('repetitions')">🌐</button>
         <div class="repetitions ${visibility.repetitions ? '' : 'hidden'}">
             <input type="checkbox"
@@ -18,14 +18,14 @@
                 class="repetitions__x"
                 min="1"
                 max="10"
-                step="1"
+                step.bind="step"
                 input.delegate="setrepetitions()"
                 value.bind="repetitions.x">
             <input type="range"
                 class="repetitions__y ${visibility.repetitionsY ? '' : 'hidden'}"
                 min="1"
                 max="10"
-                step="1"
+                step.bind="step"
                 input.delegate="setrepetitions()"
                 value.bind="repetitions.y">
         </div>
@@ -44,7 +44,7 @@
                 click.delegate="erase()">💊</button>
         <button type="button"
                 class="tools__button tools__button--color"
-                title="line color">
+                title="Line color">
                 🎨
                 <input class="colorInput" 
                     type="color" 

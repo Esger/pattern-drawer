@@ -54,6 +54,5 @@ export class TheCanvas {
     _initCanvas() {
         const canvas = document.getElementById('patternCanvas');
         paper.setup(canvas);
-        // console.log(paper);
     }
 }
