@@ -16,8 +16,11 @@ tools {
 }
 
 .hidden {
-    opacity       : 0 !important;
-    pointer-events: none;
+    opacity: 0 !important;
+
+    input& {
+        pointer-events: none;
+    }
 }
 
 .tools__button {

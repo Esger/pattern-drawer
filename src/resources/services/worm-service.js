@@ -22,16 +22,18 @@ export class WormService extends AbstractDrawService {
 
     worm(settings) {
         this._erase();
-        this._distance = new Point([0, 0]);
-        this._previousPoint = new Point([0, 0]);
+        this._distance = new paper.Point([0, 0]);
+        this._previousPoint = new paper.Point([0, 0]);
+
+        const patternWidth = paper.view.size.width / (settings.repetitions[0] + 1);
+        // The amount of points in the path:
+        const points = this.isMobile ? 15 : 25;
         // The distance between the points:
-        const segmentLength = this._isMobile ? 20 : 35;
+        const segmentLength = patternWidth / points;
 
         let path;
 
         const addWormPath = () => {
-            // The amount of points in the path:
-            const points = this.isMobile ? 15 : 25;
             if (!path) {
                 path = new paper.Path({
                     strokeColor: settings.color,
