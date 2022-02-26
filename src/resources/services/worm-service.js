@@ -8,13 +8,16 @@ export class WormService extends AbstractDrawService {
     constructor(eventAggregator) {
         super(eventAggregator);
         this._lineColorSubscription = this._eventAggregator.subscribe('lineColor', color => {
-            this._defaultColor = color;
             this._paths.forEach(path => path.strokeColor = color);
+        });
+        this._lineWidthSubscription = this._eventAggregator.subscribe('lineWidth', width => {
+            this._paths.forEach(path => path.strokeWidth = width)
         });
     }
 
     detached() {
         this._lineColorSubscription.dispose();
+        this._lineWidthSubscription.dispose();
     }
 
     worm(settings) {
@@ -32,7 +35,7 @@ export class WormService extends AbstractDrawService {
             if (!path) {
                 path = new paper.Path({
                     strokeColor: settings.color,
-                    strokeWidth: this._baseLineWidth,
+                    strokeWidth: settings.lineWidth,
                     strokeCap: 'round',
                     // shadowColor: '#00ff00cc',
                     // shadowBlur: 10,
@@ -104,10 +107,6 @@ export class WormService extends AbstractDrawService {
 
     setRepetitions(repetitions) {
         super.setRepetitions(repetitions);
-
-        // adjust path widths
-        const newStrokeWidth = Math.max(this._baseLineWidth - this._paths.flat().length / 2, this._minStrokeWidth);
-        this._paths.forEach(path => path.strokeWidth = newStrokeWidth);
 
         // position paths
         const offsetsFlat = this._offsets.flat(1);

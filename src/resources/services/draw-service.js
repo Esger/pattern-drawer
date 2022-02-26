@@ -11,24 +11,21 @@ export class DrawService extends AbstractDrawService {
         this._eraseSubscription = this._eventAggregator.subscribe('erase', _ => {
             this._erase();
             this.setRepetitions(this._repetitions);
-            this.draw();
-        });
-        this._lineColorSubscription = this._eventAggregator.subscribe('lineColor', color => {
-            this._defaultColor = color;
+            this.draw(this._settings);
         });
     }
 
     detached() {
         this._eraseSubscription.dispose();
-        this._lineColorSubscription.dispose();
     }
 
     draw(settings) {
+        this._settings = settings;
         this._drawTool = this._drawTool || new paper.Tool();
         this._drawTool.activate();
         const makeNewPath = (name) => new paper.Path({
-            strokeColor: this.settings.color,
-            strokeWidth: Math.max(this._baseLineWidth - this._offsetGroups.length / 2, this._minStrokeWidth) || 20,
+            strokeColor: settings.color || this._settings.color,
+            strokeWidth: settings.lineWidth || this._settings.lineWidth,
             strokeCap: 'round',
             name: name
         });

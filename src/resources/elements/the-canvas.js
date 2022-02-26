@@ -36,21 +36,22 @@ export class TheCanvas {
             this._saveSettings();
             switch (this._settings.mode) {
                 case 'worm':
-                    this._settings.mode = 'worm';
                     this._wormService.setRepetitions(this._settings.repetitions);
                     break;
                 case 'draw':
-                    this._settings.mode = 'draw';
                     this._drawService.setRepetitions(this._settings.repetitions);
                     break;
             }
         });
-        this._orientatation = Math.max(window.innerWidth / window.innerHeight) > 1 ? 'horizontal' : 'vertical';
         this._lineColorSubscription = this._eventAggregator.subscribe('lineColor', color => {
             this._settings.color = color;
             this._saveSettings();
         });
-        this._eventAggregator.publish('worm');
+        this._lineWidthSubscription = this._eventAggregator.subscribe('lineWidth', lineWidth => {
+            this._settings.lineWidth = lineWidth;
+            this._saveSettings();
+        })
+        this._eventAggregator.publish(this._settings.mode);
     }
 
     detached() {
@@ -58,6 +59,7 @@ export class TheCanvas {
         this._wormSubscription.dispose();
         this._distanceSubscription.dispose();
         this._lineColorSubscription.dispose();
+        this._lineWidthSubscription.dispose();
     }
 
     _saveSettings() {
@@ -67,11 +69,15 @@ export class TheCanvas {
     _loadSettings() {
         const settings = JSON.parse(localStorage.getItem('pattern-creator'));
         if (settings) this._settings = settings
-        else this._settings = {
-            mode: 'worm',
-            color: 'crimson',
-            repetitions: [1, 1],
-        };
+        else {
+            this._settings = {
+                mode: 'worm',
+                color: 'crimson',
+                lineWidth: this._isMobile ? 15 : 20,
+                repetitions: [1, 1],
+            };
+            this._saveSettings();
+        }
     }
 
     _initCanvas() {
