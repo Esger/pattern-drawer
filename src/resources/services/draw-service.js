@@ -1,55 +1,87 @@
-export class DrawService {
+import { inject } from 'aurelia-framework';
+import { AbstractDrawService } from 'services/abstract-draw-service'
+import { EventAggregator } from 'aurelia-event-aggregator';
+@inject(EventAggregator)
+export class DrawService extends AbstractDrawService {
     _drawTool;
-    _paths = [];
-    _offsets = [];
-    _defaultColor = 'crimson';
+    _offsetGroups = [];
 
-    constructor() {
-
+    constructor(eventAggregator) {
+        super(eventAggregator);
+        this._eraseSubscription = this._eventAggregator.subscribe('erase', _ => {
+            this._erase();
+            this.setRepetitions(this._repetitions);
+            this.draw();
+        });
+        this._lineColorSubscription = this._eventAggregator.subscribe('lineColor', color => {
+            this._defaultColor = color;
+        });
     }
 
-    _erase() {
-        paper.project.activeLayer.removeChildren();
-        this._paths = [];
-        this._xOffsets = [];
-        this._yOffsets = [];
+    detached() {
+        this._eraseSubscription.dispose();
+        this._lineColorSubscription.dispose();
     }
 
     draw() {
-        this._erase();
-        this._mode = 'draw';
         this._drawTool = this._drawTool || new paper.Tool();
         this._drawTool.activate();
-        const newPath = _ => new paper.Path({
-            strokeColor: 'crimson',
-            strokeWidth: 20,
-            strokeCap: 'round'
+        const makeNewPath = (name) => new paper.Path({
+            strokeColor: this._defaultColor || 'crimson',
+            strokeWidth: Math.max(this._baseLineWidth - this._offsetGroups.length / 2, this._minStrokeWidth) || 20,
+            strokeCap: 'round',
+            name: name
         });
-        let path;
+        let newPath, currentPathName;
         let penDown = false;
 
         this._drawTool.onMouseDown = (event) => {
             penDown = !penDown;
             if (penDown) {
-                path = newPath();
-                path.add(new paper.Point(event.point));
+                this._offsetGroups.forEach((offsetGroup, index) => {
+                    currentPathName = ('path-' + event.timeStamp).replace('.', '').substring(0, 12);
+                    newPath = makeNewPath(currentPathName + index);
+                    newPath.position = event.point.add(this._offsetsFlat[index]);
+                    newPath.add(new paper.Point(newPath.position));
+                    offsetGroup.addChild(newPath);
+                });
             }
         }
 
         this._drawTool.onMouseMove = (event) => {
             if (penDown) {
                 // path.fullySelected = true;
-                path.add(new paper.Point(event.point));
+                this._offsetGroups.forEach((offsetGroup, index) => {
+                    const currentPath = offsetGroup.children[currentPathName + index];
+                    const newPoint = new paper.Point(event.point.add(this._offsetsFlat.flat(1)[index]));
+                    currentPath.add(newPoint);
+                });
             }
         }
 
         this._drawTool.onMouseUp = (event) => {
-            path.simplify();
+            // overeenkomende paden in andere groepen/offsets ook
+            penDown = !penDown;
+            this._offsetGroups.forEach((offsetGroup, index) => {
+                const currentPath = offsetGroup.children[currentPathName + index];
+                currentPath.simplify();
+            })
             // path.fullySelected = false;
-            // console.log(paper);
         }
     }
 
-    _duplicateDraw() { }
+    setRepetitions(repetitions) {
+        super.setRepetitions(repetitions);
+        this._offsetGroups = [];
+        this._offsetsFlat = this._offsets.flat(1);
+        this._offsetsFlat.forEach(offset => {
+            const pathGroup = new paper.Group();
+            this._offsetGroups.push(pathGroup);
+        });
+    }
+
+    _erase() {
+        super._erase();
+    }
 
 }
