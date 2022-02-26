@@ -20,14 +20,17 @@ export class ToolsCustomElement {
 
     attached() {
         this.hideTools();
-        setTimeout(() => this.setrepetitions());
         this._drawSubscription = this._eventAggregator.subscribe('draw', () => this.step = 2);
         this._wormSubscription = this._eventAggregator.subscribe('worm', () => this.step = 1);
+        this._lineColorSubscription = this._eventAggregator.subscribe('lineColor', color => this.lineColor = color);
+        this._repetitionsSubscription = this._eventAggregator.subscribe('repetitions', repetitions => this.repetitions = repetitions);
     }
 
     detached() {
         this._drawSubscription.dispose();
         this._wormSubscription.dispose();
+        this._lineColorSubscription.dispose();
+        this._repetitionsSubscription.dispose();
     }
 
     toggleVisibility(item) {

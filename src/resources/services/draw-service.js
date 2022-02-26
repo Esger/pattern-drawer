@@ -23,11 +23,11 @@ export class DrawService extends AbstractDrawService {
         this._lineColorSubscription.dispose();
     }
 
-    draw() {
+    draw(settings) {
         this._drawTool = this._drawTool || new paper.Tool();
         this._drawTool.activate();
         const makeNewPath = (name) => new paper.Path({
-            strokeColor: this._defaultColor || 'crimson',
+            strokeColor: this.settings.color,
             strokeWidth: Math.max(this._baseLineWidth - this._offsetGroups.length / 2, this._minStrokeWidth) || 20,
             strokeCap: 'round',
             name: name

@@ -17,7 +17,7 @@ export class WormService extends AbstractDrawService {
         this._lineColorSubscription.dispose();
     }
 
-    worm() {
+    worm(settings) {
         this._erase();
         this._distance = new Point([0, 0]);
         this._previousPoint = new Point([0, 0]);
@@ -31,7 +31,7 @@ export class WormService extends AbstractDrawService {
             const points = this.isMobile ? 15 : 25;
             if (!path) {
                 path = new paper.Path({
-                    strokeColor: this._defaultColor,
+                    strokeColor: settings.color,
                     strokeWidth: this._baseLineWidth,
                     strokeCap: 'round',
                     // shadowColor: '#00ff00cc',
