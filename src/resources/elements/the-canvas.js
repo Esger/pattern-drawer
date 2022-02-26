@@ -12,6 +12,7 @@ export class TheCanvas {
         this._eventAggregator = eventAggregator;
         this._wormService = wormService;
         this._drawService = drawService;
+        this._repetitions = [1, 1];
         paper.install(window);
     }
 
@@ -19,16 +20,24 @@ export class TheCanvas {
         this._isMobile = sessionStorage.getItem('isMobile') == 'true';
         this._initCanvas();
         this._wormService.worm();
-        this._drawSubscription = this._eventAggregator.subscribe('draw', _ => this._draw());
-        this._wormSubscription = this._eventAggregator.subscribe('worm', _ => this._worm());
-        this._eraseSubscription = this._eventAggregator.subscribe('erase', _ => this._erase());
+        this._drawSubscription = this._eventAggregator.subscribe('draw', _ => {
+            this._mode = 'draw';
+            this._drawService.draw();
+            this._drawService.setRepetitions(this._repetitions);
+        });
+        this._wormSubscription = this._eventAggregator.subscribe('worm', _ => {
+            this._mode = 'worm';
+            this._wormService.worm();
+            this._wormService.setRepetitions(this._repetitions);
+        });
         this._distanceSubscription = this._eventAggregator.subscribe('repetitions', repetitions => {
+            this._repetitions = repetitions;
             switch (this._mode) {
                 case 'worm':
                     this._wormService.setRepetitions(repetitions);
                     break;
                 case 'draw':
-                    this._duplicateDraw(data.direction)
+                    this._drawService.setRepetitions(repetitions);
                     break;
             }
         });
@@ -38,7 +47,6 @@ export class TheCanvas {
     detached() {
         this._drawSubscription.dispose();
         this._wormSubscription.dispose();
-        this._eraseSubscription.dispose();
         this._distanceSubscription.dispose();
         this._lineColorSubscription.dispose();
     }
@@ -46,6 +54,5 @@ export class TheCanvas {
     _initCanvas() {
         const canvas = document.getElementById('patternCanvas');
         paper.setup(canvas);
-        // console.log(paper);
     }
 }
