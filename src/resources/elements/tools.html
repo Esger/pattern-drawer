@@ -6,6 +6,14 @@
             click.delegate="toggleVisibility('tools')">=</button>
 
     <div class="tools ${visibility.tools ? '' : 'hidden'}">
+        <button type="button"
+                class="tools__button ${isDrawing ? 'tools__button--active' : 'tools__button--hidden'}"
+                title="Worm"
+                click.delegate="isDrawing && worm()">🪱</button>
+        <button type="button"
+                class="tools__button ${!isDrawing ? 'tools__button--active' : 'tools__button--hidden'}"
+                title="Draw"
+                click.delegate="!isDrawing && draw()">✏️</button>
         <div class="submenu ${visibility.repetitions ? '' : 'hidden'}">
             <input type="checkbox"
                 name="linkRepetions"
@@ -30,14 +38,6 @@
                 class="tools__button tools__button--grid"
                 title="Repetitions"
                 click.delegate="toggleVisibility('repetitions')">🌐</button>
-        <button type="button"
-                class="tools__button ${!isDrawing ? 'tools__button--active' : ''}"
-                title="Worm"
-                click.delegate="isDrawing && worm()">🪱</button>
-        <button type="button"
-                class="tools__button ${isDrawing ? 'tools__button--active' : ''}"
-                title="Draw"
-                click.delegate="!isDrawing && draw()">✏️</button>
         <button type="button"
                 class="tools__button tools__button--color"
                 title="Line color">
