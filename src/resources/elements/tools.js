@@ -2,32 +2,40 @@ import { inject } from 'aurelia-framework';
 import { EventAggregator } from 'aurelia-event-aggregator';
 @inject(EventAggregator)
 export class ToolsCustomElement {
-    lineColor = 'crimson';
+    lineColor = undefined;
+    lineWidth = undefined;
+    repetitions = {};
 
     constructor(eventAggregator) {
         this._eventAggregator = eventAggregator;
-        this.isDrawing = false;
         this.visibility = {
             tools: false,
             repetitions: false,
             repetitionsY: false,
+            lineWidth: false,
         }
-        this.repetitions = {
-            x: 1,
-            y: 1
-        }
+        this.lineColor = undefined;
+        this.lineWidth = undefined;
     }
 
     attached() {
         this.hideTools();
-        setTimeout(() => this.setrepetitions());
         this._drawSubscription = this._eventAggregator.subscribe('draw', () => this.step = 2);
         this._wormSubscription = this._eventAggregator.subscribe('worm', () => this.step = 1);
+        const settings = JSON.parse(localStorage.getItem('pattern-creator'));
+        this.lineColor = settings.lineColor;
+        this.lineWidth = settings.lineWidth;
+        this.repetitions.x = settings.repetitions[0];
+        this.repetitions.y = settings.repetitions[1];
+        this.isDrawing = settings.mode === 'draw' || false;
     }
 
     detached() {
         this._drawSubscription.dispose();
         this._wormSubscription.dispose();
+        this._lineColorSubscription.dispose();
+        this._lineWidthSubscription.dispose();
+        this._repetitionsSubscription.dispose();
     }
 
     toggleVisibility(item) {
@@ -60,8 +68,12 @@ export class ToolsCustomElement {
         this._eventAggregator.publish('repetitions', repetitions);
     }
 
-    changeLineColor() {
+    setLineColor() {
         this._eventAggregator.publish('lineColor', this.lineColor);
+    }
+
+    setLineWidth() {
+        this._eventAggregator.publish('lineWidth', this.lineWidth);
     }
 
 }
