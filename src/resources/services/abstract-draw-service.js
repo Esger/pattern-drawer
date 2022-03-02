@@ -4,13 +4,10 @@ import { EventAggregator } from 'aurelia-event-aggregator';
 export class AbstractDrawService {
     _paths = [];
     _offsets = [];
-    _defaultColor = 'crimson';
-    _minStrokeWidth = 1;
 
     constructor(eventAggregator) {
         this._eventAggregator = eventAggregator;
         this._isMobile = sessionStorage.getItem('isMobile') == 'true';
-        this._baseLineWidth = this._isMobile ? 15 : 20;
     }
 
     _erase() {

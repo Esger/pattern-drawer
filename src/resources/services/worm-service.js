@@ -8,31 +8,36 @@ export class WormService extends AbstractDrawService {
     constructor(eventAggregator) {
         super(eventAggregator);
         this._lineColorSubscription = this._eventAggregator.subscribe('lineColor', color => {
-            this._defaultColor = color;
             this._paths.forEach(path => path.strokeColor = color);
+        });
+        this._lineWidthSubscription = this._eventAggregator.subscribe('lineWidth', width => {
+            this._paths.forEach(path => path.strokeWidth = width)
         });
     }
 
     detached() {
         this._lineColorSubscription.dispose();
+        this._lineWidthSubscription.dispose();
     }
 
-    worm() {
+    worm(settings) {
         this._erase();
-        this._distance = new Point([0, 0]);
-        this._previousPoint = new Point([0, 0]);
+        this._distance = new paper.Point([0, 0]);
+        this._previousPoint = new paper.Point([0, 0]);
+
+        const patternWidth = paper.view.size.width / (settings.repetitions[0] + 1);
+        // The amount of points in the path:
+        const points = this.isMobile ? 15 : 25;
         // The distance between the points:
-        const segmentLength = this._isMobile ? 20 : 35;
+        const segmentLength = patternWidth / points;
 
         let path;
 
         const addWormPath = () => {
-            // The amount of points in the path:
-            const points = this.isMobile ? 15 : 25;
             if (!path) {
                 path = new paper.Path({
-                    strokeColor: this._defaultColor,
-                    strokeWidth: this._baseLineWidth,
+                    strokeColor: settings.color,
+                    strokeWidth: settings.lineWidth,
                     strokeCap: 'round',
                     // shadowColor: '#00ff00cc',
                     // shadowBlur: 10,
@@ -104,10 +109,6 @@ export class WormService extends AbstractDrawService {
 
     setRepetitions(repetitions) {
         super.setRepetitions(repetitions);
-
-        // adjust path widths
-        const newStrokeWidth = Math.max(this._baseLineWidth - this._paths.flat().length / 2, this._minStrokeWidth);
-        this._paths.forEach(path => path.strokeWidth = newStrokeWidth);
 
         // position paths
         const offsetsFlat = this._offsets.flat(1);
