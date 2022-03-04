@@ -13,6 +13,7 @@ export class DrawService extends AbstractDrawService {
             this.setRepetitions(this._repetitions);
             this.draw(this._settings);
         });
+        this._undoSubscribe = this._eventAggregator.subscribe('undo', _ => this._undo());
     }
 
     detached() {
@@ -74,6 +75,13 @@ export class DrawService extends AbstractDrawService {
         this._offsetsFlat.forEach(offset => {
             const pathGroup = new paper.Group();
             this._offsetGroups.push(pathGroup);
+        });
+    }
+
+    _undo() {
+        this._offsetGroups.forEach(offsetGroup => {
+            const lastPath = offsetGroup.lastChild;
+            lastPath?.remove();
         });
     }
 

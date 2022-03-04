@@ -40,7 +40,7 @@ export class TheCanvas {
                     this._wormService.setRepetitions(this._settings.repetitions);
                     break;
                 case 'draw':
-                    this._wormService.worm(this._settings);
+                    this._drawService.draw(this._settings);
                     this._drawService.setRepetitions(this._settings.repetitions);
                     break;
             }

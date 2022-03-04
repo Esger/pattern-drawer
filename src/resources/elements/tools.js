@@ -60,6 +60,10 @@ export class ToolsCustomElement {
         this._eventAggregator.publish('erase');
     }
 
+    undo() {
+        this._eventAggregator.publish('undo');
+    }
+
     setrepetitions() {
         const repetitions = {
             x: parseInt(this.repetitions.x, 10),
