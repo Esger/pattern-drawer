@@ -2,32 +2,28 @@ import { inject } from 'aurelia-framework';
 import { EventAggregator } from 'aurelia-event-aggregator';
 @inject(EventAggregator)
 export class ToolsCustomElement {
-    lineColor = undefined;
-    lineWidth = undefined;
-    repetitions = {};
+    drawSettings = {
+        lineColor: undefined,
+        lineWidth: undefined,
+        repetitions: {}
+    };
+    visibility = {
+        tools: false,
+        repetitions: false,
+        repetitionsY: false,
+        lineWidth: false,
+    };
 
     constructor(eventAggregator) {
         this._eventAggregator = eventAggregator;
-        this.visibility = {
-            tools: false,
-            repetitions: false,
-            repetitionsY: false,
-            lineWidth: false,
-        }
-        this.lineColor = undefined;
-        this.lineWidth = undefined;
     }
 
     attached() {
         this.hideTools();
         this._drawSubscription = this._eventAggregator.subscribe('draw', () => this.step = 2);
         this._wormSubscription = this._eventAggregator.subscribe('worm', () => this.step = 1);
-        const settings = JSON.parse(localStorage.getItem('pattern-creator'));
-        this.lineColor = settings.lineColor;
-        this.lineWidth = settings.lineWidth;
-        this.repetitions.x = settings.repetitions[0];
-        this.repetitions.y = settings.repetitions[1];
-        this.isDrawing = settings.mode === 'draw' || false;
+        this.drawSettings = JSON.parse(localStorage.getItem('pattern-creator'));
+        this.isDrawing = this.drawSettings?.mode === 'draw' || false;
     }
 
     detached() {
@@ -65,19 +61,19 @@ export class ToolsCustomElement {
     }
 
     setrepetitions() {
-        const repetitions = {
-            x: parseInt(this.repetitions.x, 10),
-            y: parseInt(this.visibility.repetitionsY ? this.repetitions.y : this.repetitions.x, 10)
-        }
+        const repetitions = [
+            parseInt(this.drawSettings.repetitions[0], 10),
+            parseInt(this.visibility.repetitionsY ? this.drawSettings.repetitions[1] : this.drawSettings.repetitions[0], 10)
+        ];
         this._eventAggregator.publish('repetitions', repetitions);
     }
 
     setLineColor() {
-        this._eventAggregator.publish('lineColor', this.lineColor);
+        this._eventAggregator.publish('lineColor', this.drawSettings.lineColor);
     }
 
     setLineWidth() {
-        this._eventAggregator.publish('lineWidth', this.lineWidth);
+        this._eventAggregator.publish('lineWidth', this.drawSettings.lineWidth);
     }
 
 }

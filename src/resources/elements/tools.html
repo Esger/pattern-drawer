@@ -22,17 +22,17 @@
             <input type="range"
                 class="repetitions__x"
                 min="1"
-                max="10"
+                max="11"
                 step="2"
                 input.delegate="setrepetitions()"
-                value.bind="repetitions.x">
+                value.bind="drawSettings.repetitions[0]">
             <input type="range"
                 class="repetitions__y ${visibility.repetitionsY ? '' : 'hidden'}"
                 min="1"
-                max="10"
+                max="11"
                 step="2"
                 input.delegate="setrepetitions()"
-                value.bind="repetitions.y">
+                value.bind="drawSettings.repetitions[1]">
         </div>
         <button type="button"
                 class="tools__button tools__button--grid"
@@ -43,9 +43,9 @@
                     class="lineWidth"
                     min="1"
                     max="20"
-                    step.bind="1"
+                    step="1"
                     input.delegate="setLineWidth()"
-                    value.bind="lineWidth">
+                    value.bind="drawSettings.lineWidth">
         </div>
         <button type="button"
                 class="tools__button"
@@ -57,8 +57,9 @@
                 🎨
                 <input class="colorInput" 
                     type="color" 
+                    data-color.bind="drawSettings.lineColor"
                     input.delegate="setLineColor()"
-                    value.bind="lineColor">
+                    value.bind="drawSettings.lineColor">
                 </button>
         <button if.bind="isDrawing"
                 type="button"

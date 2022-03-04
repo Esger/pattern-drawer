@@ -32,7 +32,7 @@ export class TheCanvas {
             this._saveSettings();
         });
         this._distanceSubscription = this._eventAggregator.subscribe('repetitions', repetitions => {
-            this._settings.repetitions = [repetitions.x, repetitions.y];
+            this._settings.repetitions = repetitions;
             this._saveSettings();
             switch (this._settings.mode) {
                 case 'worm':
@@ -46,11 +46,11 @@ export class TheCanvas {
             }
         });
         this._lineColorSubscription = this._eventAggregator.subscribe('lineColor', color => {
-            this._settings.color = color;
+            this._settings.lineColor = color;
             this._saveSettings();
         });
-        this._lineWidthSubscription = this._eventAggregator.subscribe('lineWidth', lineWidth => {
-            this._settings.lineWidth = lineWidth;
+        this._lineWidthSubscription = this._eventAggregator.subscribe('lineWidth', width => {
+            this._settings.lineWidth = width;
             this._saveSettings();
         })
         this._eventAggregator.publish(this._settings.mode);
@@ -69,15 +69,25 @@ export class TheCanvas {
     }
 
     _loadSettings() {
-        const settings = JSON.parse(localStorage.getItem('pattern-creator'));
-        if (settings) this._settings = settings
-        else {
-            this._settings = {
+        const version = 'v1.1'; // increase when settings object changes
+        const defaultSettings = () => {
+            return {
+                version: version,
                 mode: 'worm',
-                color: 'crimson',
+                lineColor: '#DC143C', // 'crimson',
                 lineWidth: this._isMobile ? 15 : 20,
                 repetitions: [1, 1],
-            };
+            }
+        }
+        const settings = JSON.parse(localStorage.getItem('pattern-creator'));
+        if (settings) {
+            this._settings = settings;
+            if (settings.version !== version) {
+                this._settings = defaultSettings();
+            }
+        }
+        else {
+            this._settings = defaultSettings();
             this._saveSettings();
         }
     }
