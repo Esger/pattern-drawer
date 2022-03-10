@@ -5,6 +5,7 @@ export class ToolsCustomElement {
     drawSettings = {
         lineColor: undefined,
         lineWidth: undefined,
+        lineLength: undefined,
         repetitions: {}
     };
     visibility = {
@@ -12,6 +13,7 @@ export class ToolsCustomElement {
         repetitions: false,
         repetitionsY: false,
         lineWidth: false,
+        lineLength: false,
     };
 
     constructor(eventAggregator) {
@@ -74,6 +76,10 @@ export class ToolsCustomElement {
 
     setLineWidth() {
         this._eventAggregator.publish('lineWidth', this.drawSettings.lineWidth);
+    }
+
+    setLineLength() {
+        this._eventAggregator.publish('lineLength', this.drawSettings.lineLength);
     }
 
 }

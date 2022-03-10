@@ -29,7 +29,7 @@ export class WormService extends AbstractDrawService {
         // The amount of points in the path:
         const points = this.isMobile ? 15 : 25;
         // The distance between the points:
-        const segmentLength = patternWidth / points;
+        const segmentLength = (patternWidth / points) * wormSettings.lineLength;
 
         let path;
 
