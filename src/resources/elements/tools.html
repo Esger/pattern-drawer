@@ -3,15 +3,15 @@
     <button type="button"
             class="tools__button tools__button--toggleTools"
             title="Tools"
-            click.delegate="toggleVisibility('tools')">=</button>
+            click.delegate="toggleVisibility('tools')">🍔</button>
 
     <div class="tools ${visibility.tools ? '' : 'hidden'}">
         <button type="button"
-                class="tools__button ${isDrawing ? 'tools__button--active' : 'tools__button--hidden'}"
+                class="tools__button ${isDrawing ? '' : 'tools__button--hidden'}"
                 title="Worm"
                 click.delegate="isDrawing && worm()">🪱</button>
         <button type="button"
-                class="tools__button ${!isDrawing ? 'tools__button--active' : 'tools__button--hidden'}"
+                class="tools__button ${!isDrawing ? '' : 'tools__button--hidden'}"
                 title="Draw"
                 click.delegate="!isDrawing && draw()">✏️</button>
         <div class="submenu ${visibility.repetitions ? '' : 'hidden'}">
@@ -22,43 +22,58 @@
             <input type="range"
                 class="repetitions__x"
                 min="1"
-                max="10"
+                max="11"
                 step="2"
                 input.delegate="setrepetitions()"
-                value.bind="repetitions.x">
+                value.bind="drawSettings.repetitions[0]">
             <input type="range"
                 class="repetitions__y ${visibility.repetitionsY ? '' : 'hidden'}"
                 min="1"
-                max="10"
+                max="11"
                 step="2"
                 input.delegate="setrepetitions()"
-                value.bind="repetitions.y">
+                value.bind="drawSettings.repetitions[1]">
         </div>
         <button type="button"
                 class="tools__button tools__button--grid"
                 title="Repetitions"
                 click.delegate="toggleVisibility('repetitions')">🌐</button>
+        <div class="submenu ${visibility.lineLength && !isDrawing ? '' : 'hidden'}">
+            <input type="range"
+                    class="lineLength"
+                    min="0.1"
+                    max="3.9"
+                    step="0.1"
+                    input.delegate="setLineLength()"
+                    value.bind="drawSettings.lineLength">
+        </div>
+        <button if.bind="!isDrawing"
+                type="button"
+                class="tools__button"
+                title="Line length"
+                click.delegate="toggleVisibility('lineLength')">↔️</button>
         <div class="submenu ${visibility.lineWidth ? '' : 'hidden'}">
             <input type="range"
                     class="lineWidth"
                     min="1"
                     max="20"
-                    step.bind="1"
+                    step="1"
                     input.delegate="setLineWidth()"
-                    value.bind="lineWidth">
+                    value.bind="drawSettings.lineWidth">
         </div>
         <button type="button"
                 class="tools__button"
                 title="Line width"
-                click.delegate="toggleVisibility('lineWidth')">📶</button>
+                click.delegate="toggleVisibility('lineWidth')">↕️</button>
         <button type="button"
                 class="tools__button tools__button--color"
                 title="Line color">
                 🎨
                 <input class="colorInput" 
                     type="color" 
+                    data-color.bind="drawSettings.lineColor"
                     input.delegate="setLineColor()"
-                    value.bind="lineColor">
+                    value.bind="drawSettings.lineColor">
                 </button>
         <button if.bind="isDrawing"
                 type="button"

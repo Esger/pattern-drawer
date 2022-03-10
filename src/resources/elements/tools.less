@@ -18,7 +18,8 @@ tools {
 .hidden {
     opacity: 0 !important;
 
-    input& {
+    input,
+    button {
         pointer-events: none;
     }
 }
@@ -44,12 +45,6 @@ tools {
 
     &.tools__button--duplicateVertical div {
         transform: rotate(90deg);
-    }
-
-    &.tools__button--active {
-        opacity: 1;
-        height : auto;
-        cursor : auto;
     }
 
     &.tools__button--hidden {
@@ -88,7 +83,8 @@ tools {
 }
 
 .repetitions__x,
-.lineWidth {
+.lineWidth,
+.lineLength {
     right: 1rem;
     top  : 0;
 }
