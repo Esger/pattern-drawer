@@ -9,7 +9,7 @@ export class ToolsCustomElement {
         repetitions: {}
     };
     visibility = {
-        tools: false,
+        tools: true,
         repetitions: false,
         repetitionsY: false,
         lineWidth: false,
@@ -21,7 +21,6 @@ export class ToolsCustomElement {
     }
 
     attached() {
-        this.hideTools();
         this._drawSubscription = this._eventAggregator.subscribe('draw', () => this.step = 2);
         this._wormSubscription = this._eventAggregator.subscribe('worm', () => this.step = 1);
         this.drawSettings = JSON.parse(localStorage.getItem('pattern-creator'));
@@ -38,10 +37,6 @@ export class ToolsCustomElement {
 
     toggleVisibility(item) {
         this.visibility[item] = !this.visibility[item];
-    }
-
-    hideTools() {
-        this.visibility.tools = false;
     }
 
     draw() {

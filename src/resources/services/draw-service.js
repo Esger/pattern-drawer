@@ -113,7 +113,7 @@ export class DrawService extends AbstractDrawService {
                     path.remove();
                 });
             });
-            this._drawTool.activate();
+            // this._drawTool.activate();
         } else {
             super._erase();
         }
