@@ -26,6 +26,9 @@ export class ToolsCustomElement {
 
     toggleVisibility(item) {
         this.mySettings.visibility[item] = !this.mySettings.visibility[item];
+        this.mySettings.draw.repetitions.forEach((value, index, repetitions) => {
+            repetitions[index] = parseInt(value, 10);
+        });
         this._mySettingsService.saveSettings(this.mySettings);
     }
 
