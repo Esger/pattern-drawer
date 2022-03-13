@@ -29,6 +29,7 @@ export class ToolsCustomElement {
         this.mySettings.draw.repetitions.forEach((value, index, repetitions) => {
             repetitions[index] = parseInt(value, 10);
         });
+        this.mySettings.draw.mode = this.isDrawing ? 'draw' : 'worm';
         this._mySettingsService.saveSettings(this.mySettings);
     }
 
