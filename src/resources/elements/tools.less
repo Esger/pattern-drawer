@@ -30,6 +30,7 @@ tools {
     margin   : 0 1rem;
     font-size: 1.5rem;
     cursor   : pointer;
+    color    : var(--white);
 
     div {
         position: relative;
@@ -47,6 +48,10 @@ tools {
         transform: rotate(90deg);
     }
 
+    &.tools__button--90deg {
+        transform: rotate(90deg);
+    }
+
     &.tools__button--hidden {
         opacity: 0;
         height : 0;
@@ -56,15 +61,14 @@ tools {
 }
 
 .tools__button--toggleTools {
-    font-family: Bungee Outline;
-    color      : var(--white);
-    text-align : center;
+    color     : var(--white);
+    text-align: center;
 }
 
 .submenu {
     position  : relative;
     right     : calc(~'100% + 1rem');
-    top       : 1rem;
+    top       : .8rem;
     opacity   : 1;
     transition: opacity 250ms ease;
 

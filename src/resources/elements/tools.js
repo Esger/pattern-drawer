@@ -1,30 +1,19 @@
 import { inject } from 'aurelia-framework';
 import { EventAggregator } from 'aurelia-event-aggregator';
-@inject(EventAggregator)
+import { MySettingsService } from 'services/my-settings-service';
+@inject(EventAggregator, MySettingsService)
 export class ToolsCustomElement {
-    drawSettings = {
-        lineColor: undefined,
-        lineWidth: undefined,
-        lineLength: undefined,
-        repetitions: {}
-    };
-    visibility = {
-        tools: true,
-        repetitions: false,
-        repetitionsY: false,
-        lineWidth: false,
-        lineLength: false,
-    };
 
-    constructor(eventAggregator) {
+    constructor(eventAggregator, mySettingsService) {
         this._eventAggregator = eventAggregator;
+        this._mySettingsService = mySettingsService;
     }
 
     attached() {
+        this.mySettings = this._mySettingsService.loadSettings();
         this._drawSubscription = this._eventAggregator.subscribe('draw', () => this.step = 2);
         this._wormSubscription = this._eventAggregator.subscribe('worm', () => this.step = 1);
-        this.drawSettings = JSON.parse(localStorage.getItem('pattern-creator'));
-        this.isDrawing = this.drawSettings?.mode === 'draw' || false;
+        this.isDrawing = this.mySettings?.draw.mode === 'draw' || false;
     }
 
     detached() {
@@ -36,7 +25,8 @@ export class ToolsCustomElement {
     }
 
     toggleVisibility(item) {
-        this.visibility[item] = !this.visibility[item];
+        this.mySettings.visibility[item] = !this.mySettings.visibility[item];
+        this._mySettingsService.saveSettings(this.mySettings);
     }
 
     draw() {
@@ -59,22 +49,22 @@ export class ToolsCustomElement {
 
     setrepetitions() {
         const repetitions = [
-            parseInt(this.drawSettings.repetitions[0], 10),
-            parseInt(this.visibility.repetitionsY ? this.drawSettings.repetitions[1] : this.drawSettings.repetitions[0], 10)
+            parseInt(this.mySettings.draw.repetitions[0], 10),
+            parseInt(this.mySettings.visibility.repetitionsY ? this.mySettings.draw.repetitions[1] : this.mySettings.draw.repetitions[0], 10)
         ];
         this._eventAggregator.publish('repetitions', repetitions);
     }
 
     setLineColor() {
-        this._eventAggregator.publish('lineColor', this.drawSettings.lineColor);
+        this._eventAggregator.publish('lineColor', this.mySettings.draw.lineColor);
     }
 
     setLineWidth() {
-        this._eventAggregator.publish('lineWidth', this.drawSettings.lineWidth);
+        this._eventAggregator.publish('lineWidth', this.mySettings.draw.lineWidth);
     }
 
     setLineLength() {
-        this._eventAggregator.publish('lineLength', this.drawSettings.lineLength);
+        this._eventAggregator.publish('lineLength', this.mySettings.draw.lineLength);
     }
 
 }

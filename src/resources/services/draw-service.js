@@ -6,6 +6,7 @@ export class DrawService extends AbstractDrawService {
     _drawTool;
     _offsetGroups = [];
     _selection = [];
+    _drawSettings = {};
 
     constructor(eventAggregator) {
         super(eventAggregator);
