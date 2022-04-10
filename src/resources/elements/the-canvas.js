@@ -50,6 +50,10 @@ export class TheCanvas {
             this._mySettingsService.saveSettings(this._settings);
             this._restart();
         });
+        this._rotationSubscription = this._eventAggregator.subscribe('rotation', rotation => {
+            this._settings.draw.rotation = rotation;
+            this._mySettingsService.saveSettings(this._settings);
+        });
         this._lineColorSubscription = this._eventAggregator.subscribe('lineColor', color => {
             this._settings.draw.lineColor = color;
             this._mySettingsService.saveSettings(this._settings);
@@ -70,6 +74,7 @@ export class TheCanvas {
         this._drawSubscription.dispose();
         this._wormSubscription.dispose();
         this._distanceSubscription.dispose();
+        this._rotationSubscription.dispose();
         this._lineColorSubscription.dispose();
         this._lineWidthSubscription.dispose();
     }

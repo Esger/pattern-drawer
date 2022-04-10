@@ -38,6 +38,19 @@
                 class="tools__button material-icons md-36"
                 title="Repetitions"
                 click.delegate="toggleVisibility('repetitions')">grid_4x4</button>
+        <div class="submenu ${mySettings.visibility.rotation ? '' : 'hidden'}">
+            <input type="range"
+                    class="rotation"
+                    min="0"
+                    max="180"
+                    step="15"
+                    input.delegate="setRotation()"
+                    value.bind="mySettings.draw.rotation">
+        </div>
+        <button type="button"
+                class="tools__button material-icons md-36"
+                title="Rotation"
+                click.delegate="toggleVisibility('rotation')">settings_backup_restore</button>
         <div class="submenu ${mySettings.visibility.lineLength && !isDrawing ? '' : 'hidden'}">
             <input type="range"
                     class="lineLength"

@@ -1,5 +1,5 @@
 export class MySettingsService {
-    _version = 'v1.3'; // increase when settings object changes
+    _version = 'v1.4'; // increase when settings object changes
     _settings = {};
 
     saveSettings(settings) {

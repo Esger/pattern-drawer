@@ -59,6 +59,10 @@ export class ToolsCustomElement {
         this._eventAggregator.publish('repetitions', repetitions);
     }
 
+    setRotation() {
+        this._eventAggregator.publish('rotation', this.mySettings.draw.rotation);
+    }
+
     setLineColor() {
         this._eventAggregator.publish('lineColor', this.mySettings.draw.lineColor);
     }
