@@ -56,13 +56,6 @@ export class WormService extends AbstractDrawService {
             }
         }
 
-        const toggleActivation = (selected) => {
-            this._paths.forEach(path => {
-                path.fullySelected = selected;
-                path.opacity = selected ? 0.5 : 0.9;
-            });
-        }
-
         addWormPath();
 
         this._wormTool = this._wormTool || new paper.Tool();
@@ -70,12 +63,26 @@ export class WormService extends AbstractDrawService {
 
         this._wormTool.onMouseMove = (event) => {
             const delta = event.point.subtract(this._previousPoint);
-            this._distance = this._distance.add(delta);
 
             const offsetsFlat = this._offsets.flat(1);
             offsetsFlat.forEach((offset, index) => {
+                let newPoint = new paper.Point(offset.distance);
+
+                if (offset.rotation !== undefined) {
+                    const rotatedDelta = delta.rotate(offset.rotation, 0, 0);
+
+                    // point = point.multiply([x, y]);
+                    // point = point.multiply(canvasWidth);
+
+                    newPoint = newPoint.add(rotatedDelta);
+                } else {
+                    newPoint = newPoint.add(delta);
+                }
+
+                offset.distance = [newPoint.x, newPoint.y];
                 const path = this._paths[index];
-                path.firstSegment.point = offset.add(this._distance);
+
+                path.firstSegment.point = offset.add(offset.distance);
                 for (let i = 0; i < path.segments.length - 1; i++) {
                     const segment = path.segments[i];
                     const nextSegment = segment.next;
@@ -88,27 +95,10 @@ export class WormService extends AbstractDrawService {
 
             this._previousPoint = event.point;
         }
-
-        this._wormTool.onMouseDown = (event) => {
-            if (this._isMobile) {
-                // create trackpad like experience.
-                this._previousPoint = event.point;
-            } else {
-                if (this._paths.length) {
-                    toggleActivation(true);
-                }
-            }
-        }
-
-        this._wormTool.onMouseUp = (event) => {
-            if (!this._isMobile && this._paths.length) {
-                toggleActivation(false);
-            }
-        }
     }
 
-    setRepetitions(repetitions) {
-        super.setRepetitions(repetitions);
+    setRepetitions(settings) {
+        super.setRepetitions(settings);
 
         // position paths
         const offsetsFlat = this._offsets.flat(1);

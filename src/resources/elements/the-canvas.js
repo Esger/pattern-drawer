@@ -20,11 +20,11 @@ export class TheCanvas {
         switch (this._settings.draw.mode) {
             case 'worm':
                 this._wormService.worm(this._settings.draw);
-                this._wormService.setRepetitions(this._settings.draw.repetitions);
+                this._wormService.setRepetitions(this._settings.draw);
                 break;
             case 'draw':
                 this._drawService.draw(this._settings.draw);
-                this._drawService.setRepetitions(this._settings.draw.repetitions);
+                this._drawService.setRepetitions(this._settings.draw);
                 break;
         }
     }
@@ -36,13 +36,13 @@ export class TheCanvas {
         this._drawSubscription = this._eventAggregator.subscribe('draw', _ => {
             this._settings.draw.mode = 'draw';
             this._drawService.draw(this._settings.draw);
-            this._drawService.setRepetitions(this._settings.draw.repetitions);
+            this._drawService.setRepetitions(this._settings.draw);
             this._mySettingsService.saveSettings(this._settings);
         });
         this._wormSubscription = this._eventAggregator.subscribe('worm', _ => {
             this._settings.draw.mode = 'worm';
             this._wormService.worm(this._settings.draw);
-            this._wormService.setRepetitions(this._settings.draw.repetitions);
+            this._wormService.setRepetitions(this._settings.draw);
             this._mySettingsService.saveSettings(this._settings);
         });
         this._distanceSubscription = this._eventAggregator.subscribe('repetitions', repetitions => {
@@ -53,6 +53,7 @@ export class TheCanvas {
         this._rotationSubscription = this._eventAggregator.subscribe('rotation', rotation => {
             this._settings.draw.rotation = rotation;
             this._mySettingsService.saveSettings(this._settings);
+            this._restart();
         });
         this._lineColorSubscription = this._eventAggregator.subscribe('lineColor', color => {
             this._settings.draw.lineColor = color;

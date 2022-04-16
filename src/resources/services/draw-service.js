@@ -12,7 +12,7 @@ export class DrawService extends AbstractDrawService {
         super(eventAggregator);
         this._eraseSubscription = this._eventAggregator.subscribe('erase', _ => {
             this._erase();
-            this.setRepetitions(this._repetitions);
+            this.setRepetitions(this._drawSettings);
             this.draw(this._drawSettings);
         });
         this._undoSubscribe = this._eventAggregator.subscribe('undo', _ => this._undo());
@@ -88,8 +88,8 @@ export class DrawService extends AbstractDrawService {
         }
     }
 
-    setRepetitions(repetitions) {
-        super.setRepetitions(repetitions);
+    setRepetitions(settings) {
+        super.setRepetitions(settings);
         this._offsetGroups = [];
         this._offsetsFlat = this._offsets.flat(1);
         this._offsetsFlat.forEach(offset => {
