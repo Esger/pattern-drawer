@@ -16,7 +16,7 @@ export class MySettingsService {
             draw: {
                 mode: this._defaultMode,
                 lineColor: this._defaultColor,
-                lineWidth: this._isMobile ? 15 : 20,
+                lineWidth: this._isMobile ? 5 : 6,
                 lineLength: 1,
                 repetitions: [1, 1],
             },
@@ -34,7 +34,7 @@ export class MySettingsService {
         const settings = JSON.parse(localStorage.getItem(this._settingsName));
         if (!settings || settings.version !== this._version) this._settings = this._defaultSettings()
         else this._settings = settings;
-        this.saveSettings(settings);
-        return settings;
+        this.saveSettings(this._settings);
+        return this._settings;
     }
 }

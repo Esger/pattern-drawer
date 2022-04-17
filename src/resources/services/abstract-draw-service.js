@@ -33,7 +33,7 @@ export class AbstractDrawService {
             for (let x = 0; x < extraRepetitions.x; x++) {
                 let point = relativeSize.clone();
                 point = point.multiply([x, y]);
-                point = point.subtract(1 / 2);
+                point = point.add(-.5, 0);
                 point = point.multiply(canvasWidth);
                 xOffsets.push(point);
             }

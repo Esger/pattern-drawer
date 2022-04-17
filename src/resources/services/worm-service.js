@@ -72,10 +72,6 @@ export class WormService extends AbstractDrawService {
 
                 if (offset.rotation !== undefined) {
                     const rotatedDelta = delta.rotate(offset.rotation, 0, 0);
-
-                    // point = point.multiply([x, y]);
-                    // point = point.multiply(canvasWidth);
-
                     newPoint = newPoint.add(rotatedDelta);
                 } else {
                     newPoint = newPoint.add(delta);
