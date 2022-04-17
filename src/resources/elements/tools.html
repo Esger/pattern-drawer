@@ -24,6 +24,7 @@
                 min="1"
                 max="11"
                 step="2"
+                title="${mySettings.draw.repetitions[0] + ' horizontal'}"
                 input.delegate="setrepetitions()"
                 value.bind="mySettings.draw.repetitions[0]">
             <input type="range"
@@ -31,6 +32,7 @@
                 min="1"
                 max="11"
                 step="2"
+                title="${mySettings.draw.repetitions[1] + ' vertical'}"
                 input.delegate="setrepetitions()"
                 value.bind="mySettings.draw.repetitions[1]">
         </div>
@@ -44,6 +46,7 @@
                     min="0"
                     max="180"
                     step="15"
+                    title="${mySettings.draw.rotation + '°'}"
                     input.delegate="setRotation()"
                     value.bind="mySettings.draw.rotation">
         </div>
@@ -57,6 +60,7 @@
                     min="0.1"
                     max="3.9"
                     step="0.1"
+                    title="${mySettings.draw.lineLength}"
                     input.delegate="setLineLength()"
                     value.bind="mySettings.draw.lineLength">
         </div>
@@ -71,6 +75,7 @@
                     min="1"
                     max="20"
                     step="1"
+                    title="${mySettings.draw.lineWidth + 'px'}"
                     input.delegate="setLineWidth()"
                     value.bind="mySettings.draw.lineWidth">
         </div>
@@ -80,7 +85,7 @@
                 click.delegate="toggleVisibility('lineWidth')">line_weight</button>
         <button type="button"
                 class="tools__button material-icons md-36"
-                title="Line color">palette
+                title="${'Line color ' + mySettings.draw.lineColor}">palette
                 <input class="colorInput" 
                     type="color" 
                     data-color.bind="mySettings.draw.lineColor"

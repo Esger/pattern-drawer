@@ -23,7 +23,9 @@ export class WormService extends AbstractDrawService {
     worm(wormSettings) {
         this._erase();
         this._distance = new paper.Point([0, 0]);
-        this._previousPoint = new paper.Point([0, 0]);
+        this._previousPoint = wormSettings.rotation == '0' ?
+            new paper.Point([0, 0]) :
+            new paper.Point(paper.view.size.width / 2, paper.view.size.height / 2);
 
         const patternWidth = paper.view.size.width / (wormSettings.repetitions[0] + 1);
         // The amount of points in the path:
