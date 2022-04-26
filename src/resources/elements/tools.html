@@ -25,7 +25,7 @@
                 max="11"
                 step="2"
                 title="${mySettings.draw.repetitions[0] + ' horizontal'}"
-                input.delegate="setrepetitions()"
+                input.delegate="setGrid()"
                 value.bind="mySettings.draw.repetitions[0]">
             <input type="range"
                 class="repetitions__y ${mySettings.visibility.repetitionsY ? '' : 'hidden'}"
@@ -33,7 +33,7 @@
                 max="11"
                 step="2"
                 title="${mySettings.draw.repetitions[1] + ' vertical'}"
-                input.delegate="setrepetitions()"
+                input.delegate="setGrid()"
                 value.bind="mySettings.draw.repetitions[1]">
         </div>
         <button type="button"

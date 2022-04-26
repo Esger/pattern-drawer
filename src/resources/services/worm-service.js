@@ -66,7 +66,7 @@ export class WormService extends AbstractDrawService {
         this._wormTool.onMouseMove = (event) => {
             const delta = event.point.subtract(this._previousPoint);
 
-            const offsetsFlat = this._offsets.flat(1);
+            const offsetsFlat = this._grid.flat(1);
             offsetsFlat.forEach((offset, index) => {
                 let newPoint = new paper.Point(offset.distance);
 
@@ -95,11 +95,11 @@ export class WormService extends AbstractDrawService {
         }
     }
 
-    setRepetitions(settings) {
-        super.setRepetitions(settings);
+    setGrid(settings) {
+        super.setGrid(settings);
 
         // position paths
-        const offsetsFlat = this._offsets.flat(1);
+        const offsetsFlat = this._grid.flat(1);
         offsetsFlat.forEach((offset, index) => {
             if (index < this._paths.length) {
                 this._paths[index].position = offset;

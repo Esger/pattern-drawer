@@ -3,7 +3,7 @@ import { EventAggregator } from 'aurelia-event-aggregator';
 @inject(EventAggregator)
 export class AbstractDrawService {
     _paths = [];
-    _offsets = [];
+    _grid = [];
 
     constructor(eventAggregator) {
         this._eventAggregator = eventAggregator;
@@ -19,10 +19,10 @@ export class AbstractDrawService {
         return deg * (Math.PI / 180);
     }
 
-    setRepetitions(settings) {
+    setGrid(settings) {
         const rotation = parseInt(settings.rotation, 10) || 0;
         // two extra repetitions for 0 and max
-        const extraRepetitions = new paper.Point(settings.repetitions || [1, 1]).add(2); // Left, Right, Top, Bottom
+        const extraRepetitions = new paper.Point(settings.repetitions || [1, 1]).add(2); // minimal 3 x 3 grid
         const spaces = extraRepetitions.subtract(1);
         const canvasWidth = new paper.Point(paper.view.size);
         console.log(canvasWidth);
@@ -70,6 +70,6 @@ export class AbstractDrawService {
             yOffsets.push(offsets);
         }
 
-        this._offsets = yOffsets;
+        this._grid = yOffsets;
     }
 }

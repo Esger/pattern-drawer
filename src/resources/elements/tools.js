@@ -51,7 +51,7 @@ export class ToolsCustomElement {
         this._eventAggregator.publish('undo');
     }
 
-    setrepetitions() {
+    setGrid() {
         const repetitions = [
             parseInt(this.mySettings.draw.repetitions[0], 10),
             parseInt(this.mySettings.visibility.repetitionsY ? this.mySettings.draw.repetitions[1] : this.mySettings.draw.repetitions[0], 10)
