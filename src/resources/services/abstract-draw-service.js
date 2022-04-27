@@ -24,8 +24,9 @@ export class AbstractDrawService {
         // two extra repetitions for 0 and max
         const extraRepetitions = new paper.Point(settings.repetitions || [1, 1]).add(2); // minimal 3 x 3 grid
         const spaces = extraRepetitions.subtract(1);
-        const canvasWidth = new paper.Point(paper.view.size);
-        console.log(canvasWidth);
+        const minSize = Math.min(paper.view.size.width, paper.view.size.height);
+        const maxSquareCanvas = new paper.Point(minSize, minSize);
+        console.log(maxSquareCanvas);
         const relativeSize = new paper.Point([1, 1]).divide(spaces);
         const yOffsets = [];
         const getXoffsets = y => {
@@ -34,7 +35,7 @@ export class AbstractDrawService {
                 let point = relativeSize.clone();
                 point = point.multiply([x, y]);
                 point = point.add(-.5, 0);
-                point = point.multiply(canvasWidth);
+                point = point.multiply(maxSquareCanvas);
                 xOffsets.push(point);
             }
             return xOffsets;
@@ -48,9 +49,9 @@ export class AbstractDrawService {
                 const y = yBase * Math.sin(angleRad);
                 point = point.multiply([x, y]);
                 point = point.add(0);
-                point = point.multiply(canvasWidth);
+                point = point.multiply(maxSquareCanvas);
                 point.rotation = angle;
-                point.distance = [canvasWidth.x / 2, canvasWidth.y / 2]; // center of rotation
+                point.distance = maxSquareCanvas.divide(2); // center of rotation
                 rotations.push(point);
             }
             return rotations;
