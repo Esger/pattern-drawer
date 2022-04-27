@@ -14,6 +14,20 @@
                 class="tools__button material-icons md-36 ${!isDrawing ? '' : 'tools__button--hidden'}"
                 title="Draw"
                 click.delegate="!isDrawing && draw()">draw</button>
+        <div class="submenu ${mySettings.visibility.rotation ? '' : 'hidden'}">
+            <input type="range"
+                class="rotation"
+                min="0"
+                max="120"
+                step="15"
+                title="${mySettings.draw.rotation + '°'}"
+                input.delegate="setRotation()"
+                value.bind="mySettings.draw.rotation">
+        </div>
+        <button type="button"
+                        class="tools__button material-icons md-36"
+                        title="Rotation"
+                        click.delegate="toggleVisibility('rotation')">settings_backup_restore</button>
         <div class="submenu ${mySettings.visibility.repetitions ? '' : 'hidden'}">
             <input type="checkbox"
                 name="linkRepetitions"
@@ -40,20 +54,6 @@
                 class="tools__button material-icons md-36"
                 title="Repetitions"
                 click.delegate="toggleVisibility('repetitions')">grid_4x4</button>
-        <div class="submenu ${mySettings.visibility.rotation ? '' : 'hidden'}">
-            <input type="range"
-                    class="rotation"
-                    min="0"
-                    max="120"
-                    step="15"
-                    title="${mySettings.draw.rotation + '°'}"
-                    input.delegate="setRotation()"
-                    value.bind="mySettings.draw.rotation">
-        </div>
-        <button type="button"
-                class="tools__button material-icons md-36"
-                title="Rotation"
-                click.delegate="toggleVisibility('rotation')">settings_backup_restore</button>
         <div class="submenu ${mySettings.visibility.lineLength && !isDrawing ? '' : 'hidden'}">
             <input type="range"
                     class="lineLength"

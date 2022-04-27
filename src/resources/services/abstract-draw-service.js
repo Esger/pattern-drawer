@@ -48,8 +48,9 @@ export class AbstractDrawService {
                 const x = yBase * Math.cos(angleRad);
                 const y = yBase * Math.sin(angleRad);
                 point = point.multiply([x, y]);
-                point = point.add(0);
                 point = point.multiply(maxSquareCanvas);
+                const centerXcorrection = (paper.view.size.width / 2) - (paper.view.size.height / 2);
+                point = point.add(centerXcorrection, 0);
                 point.rotation = angle;
                 point.distance = maxSquareCanvas.divide(2); // center of rotation
                 rotations.push(point);
