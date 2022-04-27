@@ -64,13 +64,14 @@ export class WormService extends AbstractDrawService {
         this._wormTool.activate();
 
         this._wormTool.onMouseMove = (event) => {
-            const delta = event.point.subtract(this._previousPoint);
+            let delta = event.point.subtract(this._previousPoint);
 
             const offsetsFlat = this._grid.flat(1);
             offsetsFlat.forEach((offset, index) => {
                 let newPoint = new paper.Point(offset.distance);
+                const circular = offset.rotation !== undefined;
 
-                if (offset.rotation !== undefined) {
+                if (circular) {
                     const rotatedDelta = delta.rotate(offset.rotation, 0, 0);
                     newPoint = newPoint.add(rotatedDelta);
                 } else {
@@ -78,8 +79,8 @@ export class WormService extends AbstractDrawService {
                 }
 
                 offset.distance = [newPoint.x, newPoint.y];
-                const path = this._paths[index];
 
+                const path = this._paths[index];
                 path.firstSegment.point = offset.add(offset.distance);
                 for (let i = 0; i < path.segments.length - 1; i++) {
                     const segment = path.segments[i];

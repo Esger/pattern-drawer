@@ -57,16 +57,12 @@ export class AbstractDrawService {
         }
 
         // calculate offsets array
+        const circularGrid = rotation > 0;
         const endY = Math.round(extraRepetitions.y / 2);
         const startY = -endY;
         console.log(startY, endY);
         for (let y = startY; y < endY; y++) {
-            let offsets;
-            if (rotation > 0) {
-                offsets = getRotations(y);
-            } else {
-                offsets = getXoffsets(y);
-            }
+            const offsets = circularGrid ? getRotations(y) : getXoffsets(y);
             yOffsets.push(offsets);
         }
 
