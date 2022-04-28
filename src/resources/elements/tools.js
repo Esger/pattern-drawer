@@ -1,8 +1,10 @@
-import { inject } from 'aurelia-framework';
+import { inject, observable } from 'aurelia-framework';
 import { EventAggregator } from 'aurelia-event-aggregator';
 import { MySettingsService } from 'services/my-settings-service';
 @inject(EventAggregator, MySettingsService)
 export class ToolsCustomElement {
+
+    @observable repetitionsYvisible;
 
     constructor(eventAggregator, mySettingsService) {
         this._eventAggregator = eventAggregator;
@@ -10,10 +12,10 @@ export class ToolsCustomElement {
     }
 
     attached() {
-        this.mySettings = this._mySettingsService.loadSettings();
-        this._drawSubscription = this._eventAggregator.subscribe('draw', () => this.step = 2);
-        this._wormSubscription = this._eventAggregator.subscribe('worm', () => this.step = 1);
+        this.mySettings = this._mySettingsService.getSettings();
         this.isDrawing = this.mySettings?.draw.mode === 'draw' || false;
+        this.repetitionsYvisible = this.mySettings.visibility.repetitionsY;
+        this._eventAggregator.publish(this.mySettings.draw.mode);
     }
 
     detached() {
@@ -29,18 +31,26 @@ export class ToolsCustomElement {
         this.mySettings.draw.repetitions.forEach((value, index, repetitions) => {
             repetitions[index] = parseInt(value, 10);
         });
-        this.mySettings.draw.mode = this.isDrawing ? 'draw' : 'worm';
         this._mySettingsService.saveSettings(this.mySettings);
+    }
+
+    repetitionsYvisibleChanged(newValue) {
+        this.mySettings.visibility['repetitionsY'] = newValue;
+        this.setGrid();
     }
 
     draw() {
         this.isDrawing = true;
-        this._eventAggregator.publish('draw');
+        this.mySettings.draw.mode = 'draw';
+        this._mySettingsService.saveSettings(this.mySettings);
+        this._eventAggregator.publish('restart');
     }
 
     worm() {
         this.isDrawing = false;
-        this._eventAggregator.publish('worm');
+        this.mySettings.draw.mode = 'worm';
+        this._mySettingsService.saveSettings(this.mySettings);
+        this._eventAggregator.publish('restart');
     }
 
     erase() {
@@ -52,27 +62,31 @@ export class ToolsCustomElement {
     }
 
     setGrid() {
-        const repetitions = [
-            parseInt(this.mySettings.draw.repetitions[0], 10),
-            parseInt(this.mySettings.visibility.repetitionsY ? this.mySettings.draw.repetitions[1] : this.mySettings.draw.repetitions[0], 10)
-        ];
-        this._eventAggregator.publish('repetitions', repetitions);
+        if (!this.repetitionsYvisible) {
+            this.mySettings.draw.repetitions[1] = this.mySettings.draw.repetitions[0];
+        }
+        this._mySettingsService.saveSettings(this.mySettings);
+        this._eventAggregator.publish('restart');
     }
 
     setRotation() {
-        this._eventAggregator.publish('rotation', this.mySettings.draw.rotation);
+        this._mySettingsService.saveSettings(this.mySettings);
+        this._eventAggregator.publish('restart');
+    }
+
+    setLineLength() {
+        this._mySettingsService.saveSettings(this.mySettings);
+        this._eventAggregator.publish('restart');
     }
 
     setLineColor() {
+        this._mySettingsService.saveSettings(this.mySettings);
         this._eventAggregator.publish('lineColor', this.mySettings.draw.lineColor);
     }
 
     setLineWidth() {
+        this._mySettingsService.saveSettings(this.mySettings);
         this._eventAggregator.publish('lineWidth', this.mySettings.draw.lineWidth);
-    }
-
-    setLineLength() {
-        this._eventAggregator.publish('lineLength', this.mySettings.draw.lineLength);
     }
 
 }

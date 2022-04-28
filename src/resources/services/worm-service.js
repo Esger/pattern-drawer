@@ -11,7 +11,7 @@ export class WormService extends AbstractDrawService {
             this._paths.forEach(path => path.strokeColor = color);
         });
         this._lineWidthSubscription = this._eventAggregator.subscribe('lineWidth', width => {
-            this._paths.forEach(path => path.strokeWidth = width)
+            this._paths.forEach(path => path.strokeWidth = width);
         });
     }
 
@@ -23,15 +23,13 @@ export class WormService extends AbstractDrawService {
     worm(wormSettings) {
         this._erase();
         this._distance = new paper.Point([0, 0]);
-        this._previousPoint = wormSettings.rotation == '0' ?
-            new paper.Point([0, 0]) :
-            new paper.Point(paper.view.size.width / 2, paper.view.size.height / 2);
 
-        const patternWidth = paper.view.size.width / (wormSettings.repetitions[0] + 1);
+        const center = new paper.Point(paper.view.size.width, paper.view.size.height).divide(2);
+
         // The amount of points in the path:
         const points = this.isMobile ? 15 : 25;
         // The distance between the points:
-        const segmentLength = (patternWidth / points) * wormSettings.lineLength;
+        const segmentLength = wormSettings.lineLength;
 
         let path;
 
@@ -50,9 +48,8 @@ export class WormService extends AbstractDrawService {
                     // use blendmode to hide the fill and only see the shadow
                     // blendMode: 'multiply',
                 });
-                var start = paper.view.center.divide([11, 1]);
                 for (var i = 0; i < points; i++)
-                    path.add(start + new paper.Point(i * segmentLength, 0));
+                    path.add(new paper.Point(i * segmentLength, 0));
                 path.name = 'original';
                 this._paths.push(path);
             }
@@ -62,14 +59,15 @@ export class WormService extends AbstractDrawService {
 
         this._wormTool = this._wormTool || new paper.Tool();
         this._wormTool.activate();
-
+        let restarted = true;
         this._wormTool.onMouseMove = (event) => {
-            let delta = event.point.subtract(this._previousPoint);
+            let delta = restarted ? event.lastPoint.subtract(center) : event.delta;
+            restarted = false;
 
             const offsetsFlat = this._grid.flat(1);
             offsetsFlat.forEach((offset, index) => {
                 let newPoint = new paper.Point(offset.distance);
-                const circular = offset.rotation !== undefined;
+                const circular = offset.rotation > 0;
 
                 if (circular) {
                     const rotatedDelta = delta.rotate(offset.rotation, 0, 0);
@@ -91,8 +89,6 @@ export class WormService extends AbstractDrawService {
                 }
                 path.smooth({ type: 'continuous' });
             });
-
-            this._previousPoint = event.point;
         }
     }
 

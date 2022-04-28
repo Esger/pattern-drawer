@@ -56,8 +56,13 @@ export class DrawService extends AbstractDrawService {
             if (penDown) {
                 this._offsetGroups.forEach((offsetGroup, index) => {
                     const currentPath = offsetGroup.children[currentPathName + index];
-                    const newPoint = new paper.Point(event.point.add(this._flatGrid.flat(1)[index]));
+                    const circular = offsetGroup.rotation > 0;
+                    let newPoint = new paper.Point(event.point);
+                    newPoint = newPoint.add(this._flatGrid[index]);
                     currentPath.add(newPoint);
+                    if (circular) { // todo: fix rotated drawing
+                        currentPath.lastSegment.rotate(offsetGroup.rotation);
+                    }
                 });
             } else {
                 // show selection hovered path

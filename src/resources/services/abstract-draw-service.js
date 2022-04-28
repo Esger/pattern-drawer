@@ -20,36 +20,38 @@ export class AbstractDrawService {
     }
 
     setGrid(settings) {
-        const rotation = parseInt(settings.rotation, 10) || 0;
+        const rotation = parseInt(settings.rotation, 10);
         // two extra repetitions for 0 and max
-        const extraRepetitions = new paper.Point(settings.repetitions || [1, 1]).add(2); // minimal 3 x 3 grid
-        const spaces = extraRepetitions.subtract(1);
+        const extraRepetitions = new paper.Point(settings.repetitions).add(1); // minimal 2 x 2 grid
         const minSize = Math.min(paper.view.size.width, paper.view.size.height);
         const maxSquareCanvas = new paper.Point(minSize, minSize);
-        console.log(maxSquareCanvas);
-        const relativeSize = new paper.Point([1, 1]).divide(spaces);
+        const relativeSize = new paper.Point([1, 1]).divide(extraRepetitions);
         const yOffsets = [];
+        const centerXcorrection = (paper.view.size.width / 2) - (paper.view.size.height / 2);
         const getXoffsets = y => {
             const xOffsets = [];
-            for (let x = 0; x < extraRepetitions.x; x++) {
+            const endX = Math.round(extraRepetitions.x / 2);
+            const startX = -endX;
+
+            for (let x = startX; x <= endX; x++) {
                 let point = relativeSize.clone();
                 point = point.multiply([x, y]);
-                point = point.add(-.5, 0);
+                point = point.add(.5);
                 point = point.multiply(maxSquareCanvas);
+                point = point.add(centerXcorrection, 0);
                 xOffsets.push(point);
             }
             return xOffsets;
         }
         const getRotations = yBase => {
             const rotations = [];
-            for (let angle = -180; angle < 180; angle += rotation) {
+            for (let angle = 0; angle < 360; angle += rotation) {
                 const angleRad = this._deg2radians(angle);
                 let point = relativeSize.clone();
                 const x = yBase * Math.cos(angleRad);
                 const y = yBase * Math.sin(angleRad);
                 point = point.multiply([x, y]);
                 point = point.multiply(maxSquareCanvas);
-                const centerXcorrection = (paper.view.size.width / 2) - (paper.view.size.height / 2);
                 point = point.add(centerXcorrection, 0);
                 point.rotation = angle;
                 point.distance = maxSquareCanvas.divide(2); // center of rotation
@@ -58,12 +60,12 @@ export class AbstractDrawService {
             return rotations;
         }
 
-        // calculate offsets array
+        // build grid around [0, 0]
         const circularGrid = rotation > 0;
         const endY = Math.round(extraRepetitions.y / 2);
         const startY = -endY;
         console.log(startY, endY);
-        for (let y = startY; y < endY; y++) {
+        for (let y = startY; y <= endY; y++) {
             const offsets = circularGrid ? getRotations(y) : getXoffsets(y);
             yOffsets.push(offsets);
         }

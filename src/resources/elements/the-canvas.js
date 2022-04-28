@@ -10,10 +10,11 @@ export class TheCanvas {
 
     constructor(eventAggregator, wormService, drawService, mySettingsService) {
         this._eventAggregator = eventAggregator;
-        this._wormService = wormService;
         this._mySettingsService = mySettingsService;
+        this._wormService = wormService;
         this._drawService = drawService;
         paper.install(window);
+        this._getSettings();
     }
 
     _restart() {
@@ -31,53 +32,27 @@ export class TheCanvas {
 
     attached() {
         this._isMobile = sessionStorage.getItem('isMobile') == 'true';
-        this._settings = this._mySettingsService.loadSettings();
         this._initCanvas();
-        this._drawSubscription = this._eventAggregator.subscribe('draw', _ => {
-            this._settings.draw.mode = 'draw';
-            this._drawService.draw(this._settings.draw);
-            this._drawService.setGrid(this._settings.draw);
-            this._mySettingsService.saveSettings(this._settings);
-        });
-        this._wormSubscription = this._eventAggregator.subscribe('worm', _ => {
-            this._settings.draw.mode = 'worm';
-            this._wormService.worm(this._settings.draw);
-            this._wormService.setGrid(this._settings.draw);
-            this._mySettingsService.saveSettings(this._settings);
-        });
-        this._distanceSubscription = this._eventAggregator.subscribe('repetitions', repetitions => {
-            this._settings.draw.repetitions = repetitions;
-            this._mySettingsService.saveSettings(this._settings);
-            this._restart();
-        });
-        this._rotationSubscription = this._eventAggregator.subscribe('rotation', rotation => {
-            this._settings.draw.rotation = rotation;
-            this._mySettingsService.saveSettings(this._settings);
+        this._restartSubscription = this._eventAggregator.subscribe('restart', _ => {
+            this._getSettings();
             this._restart();
         });
         this._lineColorSubscription = this._eventAggregator.subscribe('lineColor', color => {
-            this._settings.draw.lineColor = color;
-            this._mySettingsService.saveSettings(this._settings);
+            this._getSettings();
         });
         this._lineWidthSubscription = this._eventAggregator.subscribe('lineWidth', width => {
-            this._settings.draw.lineWidth = width;
-            this._mySettingsService.saveSettings(this._settings);
+            this._getSettings();
         });
-        this._lineWidthSubscription = this._eventAggregator.subscribe('lineLength', length => {
-            this._settings.draw.lineLength = length;
-            this._mySettingsService.saveSettings(this._settings);
-            this._restart();
-        });
-        this._eventAggregator.publish(this._settings.draw.mode);
     }
 
     detached() {
-        this._drawSubscription.dispose();
-        this._wormSubscription.dispose();
-        this._distanceSubscription.dispose();
-        this._rotationSubscription.dispose();
+        this._restartSubscription.dispose();
         this._lineColorSubscription.dispose();
         this._lineWidthSubscription.dispose();
+    }
+
+    _getSettings() {
+        this._settings = this._mySettingsService.getSettings();
     }
 
     _initCanvas() {
