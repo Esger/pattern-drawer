@@ -30,6 +30,7 @@ export class AbstractDrawService {
         const landscape = paper.view.size.width > paper.view.size.height;
         const centerXcorrection = landscape ? (paper.view.size.width / 2) - (paper.view.size.height / 2) : 0;
         const centerYcorrection = landscape ? 0 : (paper.view.size.height / 2) - (paper.view.size.width / 2);
+
         const getXoffsets = y => {
             const xOffsets = [];
             const endX = Math.round(extraRepetitions.x / 2);
@@ -45,6 +46,7 @@ export class AbstractDrawService {
             }
             return xOffsets;
         }
+
         const getRotations = yBase => {
             const rotations = [];
             for (let angle = 0; angle < 360; angle += rotation) {
