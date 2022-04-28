@@ -1,8 +1,10 @@
-import { inject } from 'aurelia-framework';
+import { inject, observable } from 'aurelia-framework';
 import { EventAggregator } from 'aurelia-event-aggregator';
 import { MySettingsService } from 'services/my-settings-service';
 @inject(EventAggregator, MySettingsService)
 export class ToolsCustomElement {
+
+    @observable repetitionsYvisible;
 
     constructor(eventAggregator, mySettingsService) {
         this._eventAggregator = eventAggregator;
@@ -10,10 +12,10 @@ export class ToolsCustomElement {
     }
 
     attached() {
-        this.mySettings = this._mySettingsService.loadSettings();
-        this._drawSubscription = this._eventAggregator.subscribe('draw', () => this.step = 2);
-        this._wormSubscription = this._eventAggregator.subscribe('worm', () => this.step = 1);
-        this.isDrawing = this.mySettings?.draw.mode === 'draw' || false;
+        this.settings = this._mySettingsService.getSettings();
+        this.isDrawing = this.settings?.draw.mode === 'draw';
+        this.repetitionsYvisible = this.settings.visibility.repetitionsY;
+        this._eventAggregator.publish(this.settings.draw.mode);
     }
 
     detached() {
@@ -25,22 +27,30 @@ export class ToolsCustomElement {
     }
 
     toggleVisibility(item) {
-        this.mySettings.visibility[item] = !this.mySettings.visibility[item];
-        this.mySettings.draw.repetitions.forEach((value, index, repetitions) => {
+        this.settings.visibility[item] = !this.settings.visibility[item];
+        this.settings.draw.repetitions.forEach((value, index, repetitions) => {
             repetitions[index] = parseInt(value, 10);
         });
-        this.mySettings.draw.mode = this.isDrawing ? 'draw' : 'worm';
-        this._mySettingsService.saveSettings(this.mySettings);
+        this._mySettingsService.saveSettings(this.settings);
+    }
+
+    repetitionsYvisibleChanged(newValue) {
+        this.settings.visibility['repetitionsY'] = newValue;
+        this.setGrid();
     }
 
     draw() {
         this.isDrawing = true;
-        this._eventAggregator.publish('draw');
+        this.settings.draw.mode = 'draw';
+        this._mySettingsService.saveSettings(this.settings);
+        this._eventAggregator.publish('restart');
     }
 
     worm() {
         this.isDrawing = false;
-        this._eventAggregator.publish('worm');
+        this.settings.draw.mode = 'worm';
+        this._mySettingsService.saveSettings(this.settings);
+        this._eventAggregator.publish('restart');
     }
 
     erase() {
@@ -51,24 +61,32 @@ export class ToolsCustomElement {
         this._eventAggregator.publish('undo');
     }
 
-    setrepetitions() {
-        const repetitions = [
-            parseInt(this.mySettings.draw.repetitions[0], 10),
-            parseInt(this.mySettings.visibility.repetitionsY ? this.mySettings.draw.repetitions[1] : this.mySettings.draw.repetitions[0], 10)
-        ];
-        this._eventAggregator.publish('repetitions', repetitions);
+    setGrid() {
+        if (!this.repetitionsYvisible) {
+            this.settings.draw.repetitions[1] = this.settings.draw.repetitions[0];
+        }
+        this._mySettingsService.saveSettings(this.settings);
+        this._eventAggregator.publish('restart');
     }
 
-    setLineColor() {
-        this._eventAggregator.publish('lineColor', this.mySettings.draw.lineColor);
-    }
-
-    setLineWidth() {
-        this._eventAggregator.publish('lineWidth', this.mySettings.draw.lineWidth);
+    setRotation() {
+        this._mySettingsService.saveSettings(this.settings);
+        this._eventAggregator.publish('restart');
     }
 
     setLineLength() {
-        this._eventAggregator.publish('lineLength', this.mySettings.draw.lineLength);
+        this._mySettingsService.saveSettings(this.settings);
+        this._eventAggregator.publish('restart');
+    }
+
+    setLineColor() {
+        this._mySettingsService.saveSettings(this.settings);
+        this._eventAggregator.publish('lineColor', this.settings.draw.lineColor);
+    }
+
+    setLineWidth() {
+        this._mySettingsService.saveSettings(this.settings);
+        this._eventAggregator.publish('lineWidth', this.settings.draw.lineWidth);
     }
 
 }

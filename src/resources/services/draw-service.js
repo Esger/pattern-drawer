@@ -12,7 +12,7 @@ export class DrawService extends AbstractDrawService {
         super(eventAggregator);
         this._eraseSubscription = this._eventAggregator.subscribe('erase', _ => {
             this._erase();
-            this.setRepetitions(this._repetitions);
+            this.setGrid(this._drawSettings);
             this.draw(this._drawSettings);
         });
         this._undoSubscribe = this._eventAggregator.subscribe('undo', _ => this._undo());
@@ -46,7 +46,7 @@ export class DrawService extends AbstractDrawService {
             this._offsetGroups.forEach((offsetGroup, index) => {
                 currentPathName = ('path-' + event.timeStamp).replace('.', '').substring(0, 12);
                 newPath = makeNewPath(currentPathName + index);
-                newPath.position = event.point.add(this._offsetsFlat[index]);
+                newPath.position = event.point.add(this._flatGrid[index]);
                 newPath.add(new paper.Point(newPath.position));
                 offsetGroup.addChild(newPath);
             });
@@ -56,8 +56,13 @@ export class DrawService extends AbstractDrawService {
             if (penDown) {
                 this._offsetGroups.forEach((offsetGroup, index) => {
                     const currentPath = offsetGroup.children[currentPathName + index];
-                    const newPoint = new paper.Point(event.point.add(this._offsetsFlat.flat(1)[index]));
+                    const circular = offsetGroup.rotation > 0;
+                    let newPoint = new paper.Point(event.point);
+                    newPoint = newPoint.add(this._flatGrid[index]);
                     currentPath.add(newPoint);
+                    if (circular) { // todo: fix rotated drawing
+                        currentPath.lastSegment.rotate(offsetGroup.rotation);
+                    }
                 });
             } else {
                 // show selection hovered path
@@ -88,11 +93,11 @@ export class DrawService extends AbstractDrawService {
         }
     }
 
-    setRepetitions(repetitions) {
-        super.setRepetitions(repetitions);
+    setGrid(settings) {
+        super.setGrid(settings);
         this._offsetGroups = [];
-        this._offsetsFlat = this._offsets.flat(1);
-        this._offsetsFlat.forEach(offset => {
+        this._flatGrid = this._grid.flat(1);
+        this._flatGrid.forEach(offset => {
             const pathGroup = new paper.Group();
             this._offsetGroups.push(pathGroup);
             this._selection.push(new Set());

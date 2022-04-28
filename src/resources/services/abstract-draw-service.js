@@ -3,7 +3,7 @@ import { EventAggregator } from 'aurelia-event-aggregator';
 @inject(EventAggregator)
 export class AbstractDrawService {
     _paths = [];
-    _offsets = [];
+    _grid = [];
 
     constructor(eventAggregator) {
         this._eventAggregator = eventAggregator;
@@ -15,28 +15,65 @@ export class AbstractDrawService {
         this._paths = [];
     }
 
-    setRepetitions(repetitions = [1, 1]) {
-        this._repetitions = repetitions;
-        // two extra repetitions for 0 and max
-        const extraRepetitions = new paper.Point(repetitions).add(2);
-        const spaces = extraRepetitions.subtract(1);
-        const canvasWidth = new paper.Point(paper.view.size);
-        const relativeSize = new paper.Point([1, 1]).divide(spaces);
-        const yOffsets = [];
+    _deg2radians(deg) {
+        return deg * (Math.PI / 180);
+    }
 
-        // calculate offsets array
-        for (let y = 0; y < extraRepetitions.y; y++) {
+    setGrid(settings) {
+        const rotation = parseInt(settings.rotation, 10);
+        // two extra repetitions for 0 and max
+        const extraRepetitions = new paper.Point(settings.repetitions).add(1); // minimal 2 x 2 grid
+        const minSize = Math.min(paper.view.size.width, paper.view.size.height);
+        const maxSquareCanvas = new paper.Point(minSize, minSize);
+        const relativeSize = new paper.Point([1, 1]).divide(extraRepetitions);
+        const yOffsets = [];
+        const landscape = paper.view.size.width > paper.view.size.height;
+        const centerXcorrection = landscape ? (paper.view.size.width / 2) - (paper.view.size.height / 2) : 0;
+        const centerYcorrection = landscape ? 0 : (paper.view.size.height / 2) - (paper.view.size.width / 2);
+
+        const getXoffsets = y => {
             const xOffsets = [];
-            for (let x = 0; x < extraRepetitions.x; x++) {
+            const endX = Math.round(extraRepetitions.x / 2);
+            const startX = -endX;
+
+            for (let x = startX; x <= endX; x++) {
                 let point = relativeSize.clone();
-                point = point.multiply([x, y])
-                point = point.subtract(1 / 2);
-                point = point.multiply(canvasWidth);
+                point = point.multiply([x, y]);
+                point = point.add(.5);
+                point = point.multiply(maxSquareCanvas);
+                point = point.add(centerXcorrection, centerYcorrection);
                 xOffsets.push(point);
             }
-            yOffsets.push(xOffsets);
+            return xOffsets;
         }
 
-        this._offsets = yOffsets;
+        const getRotations = yBase => {
+            const rotations = [];
+            for (let angle = 0; angle < 360; angle += rotation) {
+                const angleRad = this._deg2radians(angle);
+                let point = relativeSize.clone();
+                const x = yBase * Math.cos(angleRad);
+                const y = yBase * Math.sin(angleRad);
+                point = point.multiply([x, y]);
+                point = point.multiply(maxSquareCanvas);
+                point = point.add(centerXcorrection, centerYcorrection);
+                point.rotation = angle;
+                point.distance = maxSquareCanvas.divide(2); // center of rotation
+                rotations.push(point);
+            }
+            return rotations;
+        }
+
+        // build grid around [0, 0]
+        const circularGrid = rotation > 0;
+        const endY = Math.round(extraRepetitions.y / 2);
+        const startY = -endY;
+        console.log(startY, endY);
+        for (let y = startY; y <= endY; y++) {
+            const offsets = circularGrid ? getRotations(y) : getXoffsets(y);
+            yOffsets.push(offsets);
+        }
+
+        this._grid = yOffsets;
     }
 }
