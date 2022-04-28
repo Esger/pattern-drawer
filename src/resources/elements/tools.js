@@ -12,10 +12,10 @@ export class ToolsCustomElement {
     }
 
     attached() {
-        this.mySettings = this._mySettingsService.getSettings();
-        this.isDrawing = this.mySettings?.draw.mode === 'draw' || false;
-        this.repetitionsYvisible = this.mySettings.visibility.repetitionsY;
-        this._eventAggregator.publish(this.mySettings.draw.mode);
+        this.settings = this._mySettingsService.getSettings();
+        this.isDrawing = this.settings?.draw.mode === 'draw';
+        this.repetitionsYvisible = this.settings.visibility.repetitionsY;
+        this._eventAggregator.publish(this.settings.draw.mode);
     }
 
     detached() {
@@ -27,29 +27,29 @@ export class ToolsCustomElement {
     }
 
     toggleVisibility(item) {
-        this.mySettings.visibility[item] = !this.mySettings.visibility[item];
-        this.mySettings.draw.repetitions.forEach((value, index, repetitions) => {
+        this.settings.visibility[item] = !this.settings.visibility[item];
+        this.settings.draw.repetitions.forEach((value, index, repetitions) => {
             repetitions[index] = parseInt(value, 10);
         });
-        this._mySettingsService.saveSettings(this.mySettings);
+        this._mySettingsService.saveSettings(this.settings);
     }
 
     repetitionsYvisibleChanged(newValue) {
-        this.mySettings.visibility['repetitionsY'] = newValue;
+        this.settings.visibility['repetitionsY'] = newValue;
         this.setGrid();
     }
 
     draw() {
         this.isDrawing = true;
-        this.mySettings.draw.mode = 'draw';
-        this._mySettingsService.saveSettings(this.mySettings);
+        this.settings.draw.mode = 'draw';
+        this._mySettingsService.saveSettings(this.settings);
         this._eventAggregator.publish('restart');
     }
 
     worm() {
         this.isDrawing = false;
-        this.mySettings.draw.mode = 'worm';
-        this._mySettingsService.saveSettings(this.mySettings);
+        this.settings.draw.mode = 'worm';
+        this._mySettingsService.saveSettings(this.settings);
         this._eventAggregator.publish('restart');
     }
 
@@ -63,30 +63,30 @@ export class ToolsCustomElement {
 
     setGrid() {
         if (!this.repetitionsYvisible) {
-            this.mySettings.draw.repetitions[1] = this.mySettings.draw.repetitions[0];
+            this.settings.draw.repetitions[1] = this.settings.draw.repetitions[0];
         }
-        this._mySettingsService.saveSettings(this.mySettings);
+        this._mySettingsService.saveSettings(this.settings);
         this._eventAggregator.publish('restart');
     }
 
     setRotation() {
-        this._mySettingsService.saveSettings(this.mySettings);
+        this._mySettingsService.saveSettings(this.settings);
         this._eventAggregator.publish('restart');
     }
 
     setLineLength() {
-        this._mySettingsService.saveSettings(this.mySettings);
+        this._mySettingsService.saveSettings(this.settings);
         this._eventAggregator.publish('restart');
     }
 
     setLineColor() {
-        this._mySettingsService.saveSettings(this.mySettings);
-        this._eventAggregator.publish('lineColor', this.mySettings.draw.lineColor);
+        this._mySettingsService.saveSettings(this.settings);
+        this._eventAggregator.publish('lineColor', this.settings.draw.lineColor);
     }
 
     setLineWidth() {
-        this._mySettingsService.saveSettings(this.mySettings);
-        this._eventAggregator.publish('lineWidth', this.mySettings.draw.lineWidth);
+        this._mySettingsService.saveSettings(this.settings);
+        this._eventAggregator.publish('lineWidth', this.settings.draw.lineWidth);
     }
 
 }

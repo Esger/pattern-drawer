@@ -27,7 +27,9 @@ export class AbstractDrawService {
         const maxSquareCanvas = new paper.Point(minSize, minSize);
         const relativeSize = new paper.Point([1, 1]).divide(extraRepetitions);
         const yOffsets = [];
-        const centerXcorrection = (paper.view.size.width / 2) - (paper.view.size.height / 2);
+        const landscape = paper.view.size.width > paper.view.size.height;
+        const centerXcorrection = landscape ? (paper.view.size.width / 2) - (paper.view.size.height / 2) : 0;
+        const centerYcorrection = landscape ? 0 : (paper.view.size.height / 2) - (paper.view.size.width / 2);
         const getXoffsets = y => {
             const xOffsets = [];
             const endX = Math.round(extraRepetitions.x / 2);
@@ -38,7 +40,7 @@ export class AbstractDrawService {
                 point = point.multiply([x, y]);
                 point = point.add(.5);
                 point = point.multiply(maxSquareCanvas);
-                point = point.add(centerXcorrection, 0);
+                point = point.add(centerXcorrection, centerYcorrection);
                 xOffsets.push(point);
             }
             return xOffsets;
@@ -52,7 +54,7 @@ export class AbstractDrawService {
                 const y = yBase * Math.sin(angleRad);
                 point = point.multiply([x, y]);
                 point = point.multiply(maxSquareCanvas);
-                point = point.add(centerXcorrection, 0);
+                point = point.add(centerXcorrection, centerYcorrection);
                 point.rotation = angle;
                 point.distance = maxSquareCanvas.divide(2); // center of rotation
                 rotations.push(point);
